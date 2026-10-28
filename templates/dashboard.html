@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MealMatch | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header class="navbar">
+        <h1>🍽️ MealMatch</h1>
+        <span>Connecting food with people</span>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <p class="tagline">LESS WASTE. MORE CARE.</p>
+            <h2>Good food deserves a destination.</h2>
+            <p>Connect surplus food with organisations that need it.</p>
+        </section>
+
+        <section class="cards">
+            <article class="card">
+                <h3>🍲 Food Providers</h3>
+                <p>Share available surplus food and help your community.</p>
+
+                <a href="/share-food" class="button-link glossy-green-button"
+                    onclick="return checkProviderAccess(event, 'share');">
+                    Share Food
+                </a>
+
+                <a href="/provider-requests" class="button-link glossy-green-button"
+                    onclick="return checkProviderAccess(event, 'requests');">
+                    View Requests
+                </a>
+
+                <p id="providerAccessMessage" style="display: none; color: #d93025; font-size: 14px;
+          font-weight: 600; margin-top: 12px;" role="alert">
+                </p>
+            </article>
+
+            <article class="card">
+                <h3>💚 NGOs & Organisations</h3>
+                <p>Discover available food and request what your organisation needs.</p>
+                <a href="/browse-food" class="button-link glossy-green-button">Browse Food</a>
+                <a href="/my-requests" class="button-link glossy-green-button">My Requests</a>
+            </article>
+
+            <article class="card">
+                <h3>🤖 MealMatch AI Agent</h3>
+                <p>Find suitable matches between available food and community needs.</p>
+                <button class="glossy-green-button" onclick="alert('AI matching features coming next!')">
+                    Find Matches
+                </button>
+            </article>
+        </section>
+
+        <footer>
+            <p>Together, we can reduce food waste. 💚</p>
+        </footer>
+    </main>
+    <div style="text-align: center; margin: 30px;">
+        <a href="/logout" style="display: inline-block;
+              background: #e74c3c;
+              color: white;
+              padding: 12px 25px;
+              text-decoration: none;
+              border-radius: 8px;
+              font-weight: bold;">
+            Logout
+        </a>
+    </div>
+    <script>
+        function checkProviderAccess(event, feature) {
+            const userRole = document.body.dataset.userRole;
+
+            if (userRole !== 'provider') {
+                event.preventDefault();
+
+                const message = document.getElementById(
+                    'providerAccessMessage'
+                );
+
+                if (feature === 'share') {
+                    message.textContent =
+                        'Only food providers can access Share Food.';
+                } else {
+                    message.textContent =
+                        'Only food providers can access Incoming Requests.';
+                }
+
+                message.style.display = 'block';
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+
+</html>

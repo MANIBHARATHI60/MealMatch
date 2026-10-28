@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rate Provider | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f6f3;
+            color: #26352b;
+        }
+
+        .rating-page {
+            margin-left: 250px;
+            padding: 35px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .rating-header {
+            margin-bottom: 25px;
+        }
+
+        .rating-header h1 {
+            margin: 0 0 10px;
+            color: #236B3A;
+            font-size: 34px;
+        }
+
+        .rating-header p {
+            color: #68756b;
+            line-height: 1.6;
+        }
+
+        .rating-card {
+            max-width: 650px;
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid #e3ebe2;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            box-sizing: border-box;
+        }
+
+        .rating-card h2 {
+            margin-top: 0;
+            color: #26352b;
+        }
+
+        .provider-name {
+            color: #236B3A;
+            font-weight: bold;
+        }
+
+        .rating-label {
+            display: block;
+            margin: 25px 0 10px;
+            font-weight: bold;
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .star-rating input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+        }
+
+        .star-rating label {
+            font-size: 42px;
+            color: #d7ddd8;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .star-rating label:hover {
+            transform: scale(1.12);
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover~label,
+        .star-rating input:checked~label {
+            color: #f4b400;
+        }
+
+        .star-rating input:focus-visible+label {
+            outline: 2px solid #236B3A;
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+
+        .rating-description {
+            min-height: 22px;
+            margin-bottom: 20px;
+            color: #68756b;
+            font-size: 14px;
+        }
+
+        .review-label {
+            display: block;
+            margin: 22px 0 10px;
+            font-weight: bold;
+        }
+
+        .review-input {
+            display: block;
+            width: 100%;
+            min-height: 130px;
+            padding: 13px;
+            box-sizing: border-box;
+            border: 1px solid #cfdacf;
+            border-radius: 9px;
+            font: inherit;
+            font-size: 15px;
+            resize: vertical;
+        }
+
+        .review-input:focus {
+            outline: 2px solid #b7d9c1;
+            border-color: #236B3A;
+        }
+
+        .rating-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .rating-button,
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .rating-button {
+            background: #236B3A;
+            color: #ffffff;
+        }
+
+        .rating-button:hover {
+            background: #184f2b;
+            transform: translateY(-2px);
+        }
+
+        .back-button {
+            background: #e8f5ed;
+            color: #236B3A;
+        }
+
+        .back-button:hover {
+            background: #d8ecdf;
+            transform: translateY(-2px);
+        }
+
+        .flash-message {
+            padding: 12px 15px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            background: #fff1f0;
+            color: #a12828;
+        }
+
+        @media (max-width: 768px) {
+            .rating-page {
+                margin-left: 210px;
+                padding: 20px;
+            }
+
+            .rating-header h1 {
+                font-size: 28px;
+            }
+
+            .rating-card {
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .rating-page {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .rating-card {
+                padding: 18px;
+            }
+
+            .star-rating label {
+                font-size: 36px;
+            }
+
+            .rating-actions {
+                flex-direction: column;
+            }
+
+            .rating-button,
+            .back-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="rating-page">
+
+        <header class="rating-header">
+            <h1>Rate Your Experience ⭐</h1>
+            <p>Your feedback helps other receivers make informed decisions.</p>
+        </header>
+
+        <section class="rating-card">
+
+            <h2>Review Your Food Provider</h2>
+
+            <p>
+                Provider:
+                <span class="provider-name">
+                    {{ food_request.organisation_name or 'Food Provider' }}
+                </span>
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('rate_provider', request_id=request_id) }}">
+
+                <span class="rating-label">How would you rate this experience?</span>
+
+                <div class="star-rating" role="radiogroup" aria-label="Provider rating">
+
+                    <input type="radio" id="star5" name="rating" value="5" required>
+                    <label for="star5" title="5 stars" aria-label="5 stars">★</label>
+
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 stars" aria-label="4 stars">★</label>
+
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 stars" aria-label="3 stars">★</label>
+
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 stars" aria-label="2 stars">★</label>
+
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 star" aria-label="1 star">★</label>
+
+                </div>
+
+                <p class="rating-description" id="rating-description" aria-live="polite">
+                    Select a star rating from 1 to 5.
+                </p>
+
+                <label class="review-label" for="review">
+                    Write a review (optional)
+                </label>
+
+                <textarea class="review-input" id="review" name="review" maxlength="1000"
+                    placeholder="Share your experience with this provider..."></textarea>
+
+                <div class="rating-actions">
+
+                    <button type="submit" class="rating-button">
+                        Submit Review ✓
+                    </button>
+
+                    <a href="{{ url_for('my_requests') }}" class="back-button">
+                        Back to My Requests
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script>
+        const ratingInputs = document.querySelectorAll(
+            '.star-rating input[name="rating"]'
+        );
+
+        const ratingDescription = document.getElementById(
+            'rating-description'
+        );
+
+        const ratingTexts = {
+            1: '1 star — Poor',
+            2: '2 stars — Fair',
+            3: '3 stars — Good',
+            4: '4 stars — Very Good',
+            5: '5 stars — Excellent'
+        };
+
+        ratingInputs.forEach(function (input) {
+            input.addEventListener('change', function () {
+                ratingDescription.textContent = ratingTexts[this.value];
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MealMatch Service Feedback</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f6f3;
+            color: #26352b;
+        }
+
+        .feedback-page {
+            margin-left: 250px;
+            padding: 40px 25px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .feedback-container {
+            max-width: 650px;
+            margin: 20px auto;
+            padding: 35px;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: 1px solid #e1eae2;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(35, 107, 58, 0.07);
+        }
+
+        .feedback-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .feedback-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .feedback-header h1 {
+            color: #236b3a;
+            font-size: 30px;
+            margin: 0 0 12px;
+        }
+
+        .feedback-header p {
+            color: #68756b;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .feedback-section {
+            margin-bottom: 25px;
+        }
+
+        .feedback-section label,
+        .feedback-question {
+            display: block;
+            color: #26352b;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .star-rating input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+        }
+
+        .star-rating label {
+            font-size: 42px;
+            color: #cbd5cc;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .star-rating label:hover {
+            transform: scale(1.12);
+        }
+
+        .star-rating label.selected,
+        .star-rating label.preview {
+            color: #e7ad28;
+        }
+
+        .rating-description {
+            text-align: center;
+            color: #68756b;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .feedback-section textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 14px;
+            box-sizing: border-box;
+            border: 1px solid #d8e2d9;
+            border-radius: 10px;
+            background: #fbfdfb;
+            font: inherit;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        .feedback-section textarea:focus {
+            outline: 2px solid #b9d9c4;
+            border-color: #236b3a;
+        }
+
+        .feedback-button {
+            display: block;
+            width: 100%;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #236b3a;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .feedback-button:hover {
+            background: #184f2b;
+            transform: translateY(-2px);
+        }
+
+        .feedback-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback-notice {
+            padding: 13px 15px;
+            margin-bottom: 20px;
+            border-radius: 9px;
+            background: #e8f5ed;
+            color: #236b3a;
+            line-height: 1.5;
+        }
+
+        .feedback-message {
+            padding: 13px 15px;
+            margin-bottom: 20px;
+            border-radius: 9px;
+            line-height: 1.5;
+        }
+
+        .feedback-message.success {
+            background: #e8f5ed;
+            color: #236b3a;
+        }
+
+        .feedback-message.error {
+            background: #fff0ef;
+            color: #b42318;
+        }
+
+        .feedback-footer {
+            margin-top: 22px;
+            text-align: center;
+        }
+
+        .back-link {
+            color: #236b3a;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .feedback-page {
+                margin-left: 200px;
+                padding: 25px 15px;
+            }
+
+            .feedback-container {
+                padding: 25px 20px;
+            }
+
+            .feedback-header h1 {
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .feedback-page {
+                margin-left: 0;
+                padding: 18px 12px;
+            }
+
+            .feedback-container {
+                padding: 22px 16px;
+            }
+
+            .star-rating {
+                gap: 7px;
+            }
+
+            .star-rating label {
+                font-size: 36px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .star-rating label,
+            .feedback-button {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="feedback-page">
+
+        <section class="feedback-container">
+
+            <header class="feedback-header">
+                <div class="feedback-icon">💚</div>
+
+                <h1>How Was Your MealMatch Experience?</h1>
+
+                <p>
+                    Thank you for being part of MealMatch!
+                    Your feedback helps us improve our food-sharing
+                    service for providers and receivers.
+                </p>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="feedback-message
+                        {{ 'success' if category == 'success' else 'error' }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endwith %}
+
+            <div class="feedback-notice">
+                <strong>Food exchange:</strong>
+                Request #{{ request_id }}
+                <br>
+                <strong>Feedback:</strong>
+                Your experience with MealMatch services, not a rating
+                of the other participant.
+            </div>
+
+            {% if existing_feedback %}
+
+            <div class="feedback-message success">
+                <h3>Thank you for your feedback! 💚</h3>
+
+                <p>
+                    Your rating:
+                    {{ existing_feedback.rating }} / 5 stars
+                </p>
+
+                {% if existing_feedback.comments %}
+                <p>
+                    Your comments:
+                    {{ existing_feedback.comments }}
+                </p>
+                {% endif %}
+            </div>
+
+            {% else %}
+
+            <form method="POST" action="{{ url_for('meal_match_feedback',
+                                         request_id=request_id) }}" id="serviceFeedbackForm">
+
+                <div class="feedback-section">
+
+                    <p class="feedback-question">
+                        1. How would you rate your overall experience?
+                    </p>
+
+                    <div class="star-rating" role="radiogroup" aria-label="Overall MealMatch service rating">
+
+                        {% for star in range(1, 6) %}
+
+                        <input type="radio" id="rating-{{ star }}" name="rating" value="{{ star }}" required>
+
+                        <label for="rating-{{ star }}" data-rating="{{ star }}" title="{{ star }} out of 5 stars"
+                            aria-label="{{ star }} out of 5 stars">★</label>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <p class="rating-description" id="ratingDescription" aria-live="polite">
+                        Select a star rating
+                    </p>
+
+                </div>
+
+                <div class="feedback-section">
+
+                    <label for="comments">
+                        2. What did you think of our service?
+                    </label>
+
+                    <textarea id="comments" name="comments" maxlength="2000"
+                        placeholder="Tell us what worked well or what we could improve..."></textarea>
+
+                </div>
+
+                <button type="submit" class="feedback-button" id="submitFeedback">
+                    Submit Feedback 💚
+                </button>
+
+            </form>
+
+            {% endif %}
+
+            <div class="feedback-footer">
+                <a class="back-link" href="{{ url_for('ai_agent',
+                                    request_id=request_id) }}">
+                    ← Back to AI Agent Chat
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        const ratingInputs = document.querySelectorAll(
+            '.star-rating input[name="rating"]'
+        );
+
+        const ratingLabels = document.querySelectorAll(
+            '.star-rating label'
+        );
+
+        const ratingDescription = document.getElementById(
+            'ratingDescription'
+        );
+
+        const ratingTexts = {
+            1: "Poor",
+            2: "Fair",
+            3: "Good",
+            4: "Very good",
+            5: "Excellent"
+        };
+
+        function updateStars(rating) {
+            ratingLabels.forEach(label => {
+                const value = Number(label.dataset.rating);
+
+                label.classList.toggle(
+                    "selected",
+                    value <= rating
+                );
+
+                label.classList.remove("preview");
+            });
+        }
+
+        ratingLabels.forEach(label => {
+
+            label.addEventListener("mouseenter", () => {
+                const rating = Number(label.dataset.rating);
+
+                ratingLabels.forEach(star => {
+                    star.classList.toggle(
+                        "preview",
+                        Number(star.dataset.rating) <= rating
+                    );
+                });
+            });
+
+            label.addEventListener("mouseleave", () => {
+                ratingLabels.forEach(star => {
+                    star.classList.remove("preview");
+                });
+            });
+        });
+
+        ratingInputs.forEach(input => {
+
+            input.addEventListener("change", () => {
+                const rating = Number(input.value);
+
+                updateStars(rating);
+
+                ratingDescription.textContent =
+                    ratingTexts[rating];
+            });
+
+        });
+
+        const feedbackForm = document.getElementById(
+            "serviceFeedbackForm"
+        );
+
+        if (feedbackForm) {
+            feedbackForm.addEventListener("submit", event => {
+
+                const selectedRating = document.querySelector(
+                    '.star-rating input[name="rating"]:checked'
+                );
+
+                if (!selectedRating) {
+                    event.preventDefault();
+
+                    ratingDescription.textContent =
+                        "Please select a star rating.";
+
+                    return;
+                }
+
+                const submitButton = document.getElementById(
+                    "submitFeedback"
+                );
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting...";
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f8f6;
+            font-family: Arial, sans-serif;
+            color: #26352b;
+        }
+
+        .profile-container {
+            margin-left: 250px;
+            padding: 35px;
+            min-height: 100vh;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .profile-header h1 {
+            color: #207a4b;
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .profile-header p {
+            color: #6b756e;
+            margin: 0;
+        }
+
+        .profile-card {
+            max-width: 900px;
+            background: #ffffff;
+            border: 1px solid #e1eae3;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 25px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e8eee9;
+        }
+
+        .profile-avatar {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: #e3f4e8;
+            color: #278653;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .profile-summary h2 {
+            margin: 0 0 7px;
+            color: #26352b;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-summary p {
+            margin: 0;
+            color: #778078;
+            overflow-wrap: anywhere;
+        }
+
+        .account-badge {
+            display: inline-block;
+            margin-top: 9px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #e8f6ec;
+            color: #247a4d;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            color: #247a4d;
+            font-size: 18px;
+            margin: 25px 0 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #45534a;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d8e2da;
+            border-radius: 9px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #ffffff;
+            color: #26352b;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #278653;
+            box-shadow: 0 0 0 3px rgba(39, 134, 83, 0.10);
+        }
+
+        .form-group input:disabled,
+        .form-group select:disabled,
+        .form-group textarea:disabled {
+            background: #f5f7f5;
+            color: #59645c;
+            cursor: not-allowed;
+        }
+
+        .form-note {
+            margin-top: 7px;
+            color: #7a847c;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .profile-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e8eee9;
+            margin-top: 30px;
+            padding-top: 25px;
+        }
+
+        .profile-button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-button,
+        .save-button {
+            background: #278653;
+            color: #ffffff;
+        }
+
+        .edit-button:hover,
+        .save-button:hover {
+            background: #17683d;
+        }
+
+        .cancel-button,
+        .back-button {
+            background: #edf1ee;
+            color: #37443a;
+        }
+
+        .cancel-button:hover,
+        .back-button:hover {
+            background: #dfe7e1;
+        }
+
+        .save-button,
+        .cancel-button {
+            display: none;
+        }
+
+        .message {
+            max-width: 900px;
+            padding: 13px 16px;
+            border-radius: 9px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #e4f7e9;
+            color: #216b3b;
+            border: 1px solid #bce5c7;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            color: #b83232;
+            border: 1px solid #f1c4c4;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .profile-card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .profile-header h1 {
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .profile-container {
+                padding: 14px;
+            }
+
+            .profile-summary {
+                align-items: flex-start;
+            }
+
+            .profile-avatar {
+                width: 55px;
+                height: 55px;
+                font-size: 23px;
+            }
+        }
+
+        /* =========================================
+   MEALMATCH PROFILE PAGE — DESIGN UPGRADE
+   Applies to Provider and Receiver Profiles
+   ========================================= */
+
+        /* Page background */
+        body {
+            background: #f7f9f6;
+        }
+
+        /* Main profile layout */
+        .profile-container {
+            padding: 38px;
+        }
+
+        /* Profile heading */
+        .profile-header h1 {
+            color: #236B3A;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-header p {
+            color: #6b756e;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Main profile card */
+        .profile-card {
+            max-width: 950px;
+            padding: 34px;
+            background: #ffffff;
+            border: 1px solid #e4ebe3;
+            border-radius: 20px;
+            box-shadow: 0 8px 28px rgba(35, 107, 58, 0.06);
+            transition: box-shadow 0.25s ease;
+        }
+
+        .profile-card:hover {
+            box-shadow: 0 12px 34px rgba(35, 107, 58, 0.10);
+        }
+
+        /* Profile avatar */
+        .profile-avatar {
+            width: 82px;
+            height: 82px;
+            border: 3px solid #d7ead7;
+            background: linear-gradient(135deg, #e8f5e8, #d8ecd8);
+            color: #236B3A;
+            font-size: 32px;
+            box-shadow: 0 4px 12px rgba(35, 107, 58, 0.08);
+        }
+
+        /* Name and email */
+        .profile-summary h2 {
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .profile-summary p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Account type badge */
+        .account-badge {
+            background: #e8f3e7;
+            color: #236B3A;
+            padding: 7px 13px;
+            border: 1px solid #d6e9d4;
+            letter-spacing: 0.2px;
+        }
+
+        /* Section headings */
+        .section-title {
+            color: #236B3A;
+            font-size: 18px;
+            font-weight: 700;
+            padding-bottom: 11px;
+            border-bottom: 1px solid #edf1ec;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* Form labels */
+        .form-group label {
+            color: #34483a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Input fields */
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            min-height: 44px;
+            border: 1px solid #dce5dc;
+            border-radius: 10px;
+            padding: 12px 14px;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+        }
+
+        /* Highlight editable fields */
+        .form-group input:not(:disabled):hover,
+        .form-group select:not(:disabled):hover,
+        .form-group textarea:not(:disabled):hover {
+            border-color: #8bbd91;
+        }
+
+        /* Focus effect */
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4c963f;
+            box-shadow: 0 0 0 3px rgba(76, 150, 63, 0.13);
+        }
+
+        /* Disabled fields */
+        .form-group input:disabled,
+        .form-group select:disabled,
+        .form-group textarea:disabled {
+            background: #f7f9f7;
+            color: #58665b;
+            border-color: #e4eae3;
+            opacity: 1;
+        }
+
+        /* Helper text */
+        .form-note {
+            line-height: 1.6;
+            color: #7b857c;
+        }
+
+        /* Bottom action area */
+        .profile-actions {
+            gap: 14px;
+            margin-top: 34px;
+            padding-top: 26px;
+            border-top: 1px solid #e8eee8;
+        }
+
+        /* All profile buttons */
+        .profile-button {
+            min-height: 44px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            transition:
+                transform 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        /* Edit and Save buttons */
+        .edit-button,
+        .save-button {
+            background: #236B3A;
+            color: #ffffff;
+            border: 1px solid #236B3A;
+            box-shadow: 0 3px 8px rgba(35, 107, 58, 0.12);
+        }
+
+        .edit-button:hover,
+        .save-button:hover {
+            background: #194f2b;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 14px rgba(35, 107, 58, 0.20);
+        }
+
+        /* Cancel and Dashboard buttons */
+        .cancel-button,
+        .back-button {
+            background: #ffffff;
+            color: #236B3A;
+            border: 1px solid #cfded0;
+        }
+
+        .cancel-button:hover,
+        .back-button:hover {
+            background: #edf5ec;
+            color: #236B3A;
+            border-color: #9fc5a0;
+            transform: translateY(-3px);
+        }
+
+        /* Press effect */
+        .profile-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* Keyboard accessibility */
+        .profile-button:focus-visible {
+            outline: 3px solid rgba(76, 150, 63, 0.35);
+            outline-offset: 3px;
+        }
+
+        /* Success message */
+        .success-message {
+            background: #edf8ed;
+            color: #236B3A;
+            border: 1px solid #cce5cc;
+            border-radius: 10px;
+            padding: 15px 18px;
+        }
+
+        /* Error message */
+        .error-message {
+            border-radius: 10px;
+            padding: 15px 18px;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 24px;
+            }
+
+            .profile-card {
+                padding: 24px;
+            }
+
+            .profile-header h1 {
+                font-size: 27px;
+            }
+
+            .profile-summary h2 {
+                font-size: 20px;
+            }
+
+            .profile-actions {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .profile-container {
+                padding: 16px;
+            }
+
+            .profile-card {
+                padding: 18px;
+                border-radius: 15px;
+            }
+
+            .profile-summary {
+                gap: 13px;
+            }
+
+            .profile-avatar {
+                width: 58px;
+                height: 58px;
+                font-size: 23px;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .profile-actions .profile-button {
+                width: 100%;
+            }
+        }
+
+        /* =========================================
+MY PROFILE — PREMIUM HEADER BANNER
+========================================= */
+
+        .profile-header {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 30px 32px;
+            margin-bottom: 28px;
+            background: linear-gradient(115deg, #e8f5e9, #f5faf4);
+            border: 1px solid #d8e9d8;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(35, 107, 58, 0.05);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .profile-header:hover {
+            box-shadow: 0 9px 25px rgba(35, 107, 58, 0.09);
+        }
+
+        .profile-header-content {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+        }
+
+        .profile-header h1 {
+            color: #236B3A;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.6px;
+            margin: 0 0 9px;
+        }
+
+        .profile-header p {
+            color: #647568;
+            font-size: 15px;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .profile-header-icon {
+            position: absolute;
+            right: 175px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 100px;
+            line-height: 1;
+            opacity: 0.10;
+            filter: grayscale(1);
+
+            pointer-events: none;
+            user-select: none;
+
+            transition: transform 0.35s ease, opacity 0.35s ease;
+
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .profile-header:hover .profile-header-icon {
+                transform: translateY(-50%) scale(1.08);
+                opacity: 0.16;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 24px;
+            }
+
+
+            .profile-header h1 {
+                font-size: 27px;
+            }
+
+            .profile-header-icon {
+                right: 145px;
+                font-size: 75px;
+            }
+
+        }
+
+        @media (max-width: 500px) {
+            .profile-header {
+                padding: 20px;
+                gap: 14px;
+            }
+
+            .profile-header h1 {
+                font-size: 24px;
+            }
+
+            .profile-header p {
+                font-size: 13px;
+            }
+
+            .profile-header-icon {
+                right: 12px;
+                top: 15px;
+                transform: none;
+                font-size: 48px;
+                opacity: 0.08;
+            }
+
+            .profile-header:hover .profile-header-icon {
+                transform: scale(1.05);
+            }
+        }
+
+        /* =========================================
+MEALMATCH — PREMIUM GREEN PROFILE BANNER
+========================================= */
+
+        .profile-header {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+
+            min-height: 190px;
+            padding: 32px 36px;
+            margin-bottom: 30px;
+
+            background: linear-gradient(115deg,
+                    #174f2d 0%,
+                    #236b3a 48%,
+                    #348650 100%);
+
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 20px;
+
+            box-shadow:
+                0 10px 28px rgba(25, 85, 45, 0.16),
+                0 3px 8px rgba(25, 85, 45, 0.07);
+
+            animation: profileBannerEntrance 0.65s ease both;
+
+            transition:
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+
+        }
+
+        /* Soft decorative glow */
+
+        .profile-header::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 270px;
+            height: 270px;
+            right: 100px;
+            top: -150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            pointer-events: none;
+
+        }
+
+        .profile-header::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 190px;
+            height: 190px;
+            right: 220px;
+            bottom: -135px;
+            border-radius: 50%;
+            background: rgba(190, 235, 194, 0.10);
+            pointer-events: none;
+
+        }
+
+        @keyframes profileBannerEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+        /* Banner text */
+
+        .profile-header-content {
+            position: relative;
+            z-index: 2;
+            min-width: 0;
+        }
+
+        .profile-eyebrow {
+            display: inline-block;
+            margin-bottom: 11px;
+            color: #d2ebd6;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .profile-header h1 {
+            margin: 0 0 10px;
+            color: #ffffff;
+            font-size: 35px;
+            font-weight: 750;
+            line-height: 1.2;
+            letter-spacing: -0.8px;
+        }
+
+        .heading-sparkle {
+            display: inline-block;
+            margin-left: 4px;
+            color: #bde7c4;
+            font-size: 23px;
+            vertical-align: 5px;
+            transition: transform 0.3s ease;
+
+        }
+
+        .profile-header p {
+            max-width: 480px;
+            margin: 0;
+            color: #e1efe4;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* Faded decorative profile icon */
+
+        .profile-header-icon {
+            position: absolute;
+            z-index: 0;
+            right: 175px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            font-size: 118px;
+            line-height: 1;
+
+            opacity: 0.13;
+            filter: grayscale(1);
+
+            pointer-events: none;
+            user-select: none;
+
+            transition:
+                transform 0.4s ease,
+                opacity 0.4s ease;
+
+        }
+
+        /* Dashboard button */
+
+        .profile-header .back-button {
+            position: relative;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            flex-shrink: 0;
+            min-height: 45px;
+            padding: 12px 18px;
+
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            border-radius: 10px;
+
+            backdrop-filter: blur(5px);
+
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+
+            transition:
+                transform 0.22s ease,
+                background-color 0.22s ease,
+                border-color 0.22s ease,
+                box-shadow 0.22s ease;
+
+        }
+
+        .dashboard-arrow {
+            display: inline-block;
+            font-size: 18px;
+            transition: transform 0.22s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .profile-header:hover {
+                box-shadow:
+                    0 14px 34px rgba(25, 85, 45, 0.20),
+                    0 4px 10px rgba(25, 85, 45, 0.08);
+            }
+
+            .profile-header:hover .profile-header-icon {
+                transform: translateY(-50%) scale(1.08) rotate(-5deg);
+                opacity: 0.19;
+            }
+
+            .profile-header:hover .heading-sparkle {
+                transform: rotate(45deg) scale(1.12);
+            }
+
+            .profile-header .back-button:hover {
+                color: #ffffff;
+                background: rgba(255, 255, 255, 0.22);
+                border-color: rgba(255, 255, 255, 0.55);
+
+                transform: translateY(-3px);
+
+                box-shadow: 0 7px 16px rgba(0, 0, 0, 0.14);
+            }
+
+            .profile-header .back-button:hover .dashboard-arrow {
+                transform: translateX(-3px);
+            }
+
+
+        }
+
+        .profile-header .back-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* Tablet */
+
+        @media (max-width: 768px) {
+            .profile-header {
+                min-height: 175px;
+                padding: 27px;
+                gap: 14px;
+            }
+
+
+            .profile-header h1 {
+                font-size: 29px;
+            }
+
+            .profile-header-icon {
+                right: 145px;
+                font-size: 90px;
+            }
+
+            .profile-header .back-button {
+                padding: 11px 14px;
+            }
+
+        }
+
+        /* Mobile */
+
+        @media (max-width: 500px) {
+            .profile-header {
+                align-items: flex-start;
+                flex-wrap: wrap;
+                min-height: 0;
+                padding: 23px 20px;
+                gap: 18px;
+            }
+
+            .profile-header-content {
+                width: 100%;
+            }
+
+            .profile-header h1 {
+                font-size: 26px;
+            }
+
+            .profile-header p {
+                max-width: 85%;
+                font-size: 13px;
+            }
+
+            .profile-header-icon {
+                right: 14px;
+                top: 20px;
+                transform: none;
+                font-size: 52px;
+                opacity: 0.11;
+            }
+
+            .profile-header:hover .profile-header-icon {
+                transform: scale(1.05);
+            }
+
+            .profile-header .back-button {
+                align-self: flex-start;
+            }
+
+        }
+
+        /* Respect reduced-motion preferences */
+
+        @media (prefers-reduced-motion: reduce) {
+            .profile-header {
+                animation: none;
+                transition: none;
+            }
+
+            .profile-header-icon,
+            .heading-sparkle,
+            .profile-header .back-button,
+            .dashboard-arrow {
+                transition: none;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="profile-container">
+
+        <header class="profile-header">
+
+
+            <div class="profile-header-content">
+                <span class="profile-eyebrow">YOUR ACCOUNT</span>
+
+                <h1>My Profile <span class="heading-sparkle">✦</span></h1>
+
+                <p>
+                    Your details, your organisation, your MealMatch account.
+                </p>
+            </div>
+
+            <span class="profile-header-icon" aria-hidden="true">👤</span>
+
+            <a href="{{ url_for('dashboard') }}" class="profile-button back-button glossy-green-button">
+                <span class="dashboard-arrow">←</span>
+                Dashboard
+            </a>
+
+        </header>
+
+
+        {% if request.args.get('saved') == '1' %}
+        <div class="message success-message" role="status">
+            Profile updated successfully!
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="message error-message" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <section class="profile-card">
+
+            <div class="profile-summary">
+
+                <div class="profile-avatar">
+                    {{ profile.name[0]|upper if profile.name else 'U' }}
+                </div>
+
+                <div>
+                    <h2>{{ profile.name or 'Your Name' }}</h2>
+
+                    <p>{{ profile.email }}</p>
+
+                    <span class="account-badge">
+                        {% if profile.role == 'provider' %}
+                        Food Provider
+                        {% else %}
+                        Receiver
+                        {% endif %}
+                    </span>
+                </div>
+
+            </div>
+
+            <form method="POST" action="{{ url_for('profile') }}" id="profileForm">
+
+                <h3 class="section-title">Personal & Contact Details</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" value="{{ profile.name or '' }}" maxlength="100"
+                            required disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="tel" id="phone_number" name="phone_number" value="{{ profile.phone_number or '' }}"
+                            maxlength="20" autocomplete="tel" disabled>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" value="{{ profile.email or '' }}" disabled>
+
+                        <span class="form-note">
+                            Your registered email address cannot be changed here.
+                        </span>
+                    </div>
+
+                </div>
+
+                {% if profile.role == 'provider' %}
+
+                <h3 class="section-title">Organisation Details</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="organisation_name">
+                            Organisation Name
+                        </label>
+
+                        <input type="text" id="organisation_name" name="organisation_name"
+                            value="{{ profile.organisation_name or '' }}" maxlength="150" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="organisation_type">
+                            Organisation Type
+                        </label>
+
+                        <select id="organisation_type" name="organisation_type" disabled>
+
+                            <option value="">Select organisation type</option>
+
+                            {% for kind in [
+                            'Restaurant',
+                            'Hotel',
+                            'Hostel',
+                            'Canteen',
+                            'Catering Service',
+                            'Bakery',
+                            'Event Organiser',
+                            'Other'
+                            ] %}
+
+                            <option value="{{ kind }}" {% if profile.organisation_type==kind %} selected {% endif %}>
+                                {{ kind }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="fssai_number">
+                            FSSAI Licence/Registration Number
+                        </label>
+
+                        <input type="text" id="fssai_number" name="fssai_number"
+                            value="{{ profile.fssai_number or '' }}" maxlength="100" disabled>
+
+                        <span class="form-note">
+                            Enter the applicable FSSAI licence or registration
+                            number for your food business.
+                        </span>
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+                <h3 class="section-title">Location Details</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="address">Address</label>
+
+                        <textarea id="address" name="address" rows="3" maxlength="255" autocomplete="street-address"
+                            disabled>{{ profile.address or '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+
+                        <input type="text" id="city" name="city" value="{{ profile.city or '' }}" maxlength="100"
+                            autocomplete="address-level2" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+
+                        <input type="text" id="pincode" name="pincode" value="{{ profile.pincode or '' }}"
+                            maxlength="10" autocomplete="postal-code" disabled>
+                    </div>
+
+                </div>
+
+                <div class="profile-actions">
+
+                    <button type="button" id="editButton" class="profile-button edit-button glossy-green-button"
+                        onclick="enableEditing()">
+                        ✏️ Edit Profile
+                    </button>
+
+                    <button type="button" id="cancelButton" class="profile-button cancel-button"
+                        onclick="cancelEditing()">
+                        Cancel
+                    </button>
+
+                    <button type="submit" id="saveButton" class="profile-button save-button">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script>
+        const form = document.getElementById("profileForm");
+        const editButton = document.getElementById("editButton");
+        const saveButton = document.getElementById("saveButton");
+        const cancelButton = document.getElementById("cancelButton");
+
+        let originalValues = {};
+
+        function saveOriginalValues() {
+            originalValues = {};
+
+            form.querySelectorAll("input, select, textarea").forEach(field => {
+                originalValues[field.id] = field.value;
+            });
+        }
+
+        function enableEditing() {
+            saveOriginalValues();
+
+            form.querySelectorAll(
+                "input[name], select, textarea"
+            ).forEach(field => {
+                field.disabled = false;
+            });
+
+            editButton.style.display = "none";
+            saveButton.style.display = "inline-flex";
+            cancelButton.style.display = "inline-flex";
+        }
+
+        function cancelEditing() {
+            form.querySelectorAll("input, select, textarea").forEach(field => {
+                if (Object.prototype.hasOwnProperty.call(
+                    originalValues, field.id
+                )) {
+                    field.value = originalValues[field.id];
+                }
+
+                field.disabled = true;
+            });
+
+            editButton.style.display = "inline-flex";
+            saveButton.style.display = "none";
+            cancelButton.style.display = "none";
+        }
+
+        form.addEventListener("submit", function (event) {
+            const name = document.getElementById("name").value.trim();
+
+            if (!name) {
+                event.preventDefault();
+                alert("Please enter your name.");
+                return;
+            }
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,2516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Browse Food | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* =========================================
+           GLOBAL STYLING
+        ========================================= */
+
+        :root {
+            --browse-green: #236b3a;
+            --browse-green-dark: #184f2b;
+            --browse-green-light: #eaf5ed;
+            --browse-text: #24362a;
+            --browse-muted: #68766c;
+            --browse-border: #e5ece6;
+            --browse-white: #ffffff;
+            --browse-shadow: 0 5px 18px rgba(31, 66, 46, 0.06);
+            --browse-shadow-hover: 0 14px 30px rgba(31, 66, 46, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f2f6f3;
+            color: var(--browse-text);
+            font-family: Arial, sans-serif;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button,
+        a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        /* =========================================
+           MAIN PAGE LAYOUT
+        ========================================= */
+
+        .browse-page {
+            width: auto;
+            max-width: 1600px;
+            min-width: 0;
+            min-height: 100vh;
+            margin-left: 250px;
+            padding: 30px 32px;
+        }
+
+
+        /* =========================================
+           TOP NAVIGATION
+        ========================================= */
+
+        .browse-navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .back-dashboard {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 42px;
+            padding: 10px 15px;
+            border: 1px solid #236b3a;
+            border-radius: 10px;
+            background: #236b3a;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .back-dashboard:hover {
+            background: var(--browse-green);
+            color: var(--browse-white);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(35, 107, 58, 0.15);
+        }
+
+        .back-dashboard:focus-visible,
+        .details-button:focus-visible,
+        .request-form button:focus-visible,
+        .food-filters button:focus-visible,
+        .view-reviews-button:focus-visible {
+            outline: 3px solid #a6d9b5;
+            outline-offset: 3px;
+        }
+
+
+        /* =========================================
+           SUCCESS MESSAGE
+        ========================================= */
+
+        .request-success {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 16px 19px;
+            border: 1px solid #a7d7ad;
+            border-radius: 12px;
+            background: #edf8ee;
+            color: var(--browse-green);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.6;
+            box-shadow: 0 4px 12px rgba(35, 107, 58, 0.05);
+        }
+
+        .success-icon {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #d8efdc;
+            font-size: 15px;
+        }
+
+
+        /* =========================================
+           PREMIUM WELCOME BANNER
+        ========================================= */
+
+        .browse-intro {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            padding: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            background: linear-gradient(125deg,
+                    #174f2b 0%,
+                    #236b3a 58%,
+                    #398751 100%);
+            color: var(--browse-white);
+            box-shadow: 0 12px 30px rgba(23, 79, 43, 0.16);
+        }
+
+        .browse-intro::before,
+        .browse-intro::after {
+            position: absolute;
+            content: "";
+            pointer-events: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.055);
+        }
+
+        .browse-intro::before {
+            width: 280px;
+            height: 280px;
+            right: -75px;
+            top: -155px;
+        }
+
+        .browse-intro::after {
+            width: 210px;
+            height: 210px;
+            right: 80px;
+            bottom: -155px;
+        }
+
+        .browse-intro-content {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            min-width: 0;
+        }
+
+        .browse-intro .tagline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 17px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.10);
+            color: #e2f5e6;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .browse-intro h1 {
+            margin: 0 0 15px;
+            color: var(--browse-white);
+            font-size: clamp(28px, 3.2vw, 40px);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.7px;
+        }
+
+        .browse-intro-description {
+            max-width: 610px;
+            margin: 0;
+            color: #e0eee3;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .browse-hero-visual {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 142px;
+            height: 142px;
+            border: 1px solid rgba(255, 255, 255, 0.23);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+            transform: rotate(4deg);
+            transition: transform 0.25s ease;
+        }
+
+        .browse-intro:hover .browse-hero-visual {
+            transform: rotate(0deg) translateY(-3px);
+        }
+
+        .browse-hero-visual span {
+            font-size: 70px;
+            line-height: 1;
+        }
+
+
+        /* =========================================
+           SECTION HEADING
+        ========================================= */
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 0 0 20px;
+        }
+
+        .section-heading-content {
+            min-width: 0;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 7px;
+            color: var(--browse-text);
+            font-size: 23px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .section-heading p {
+            margin: 0;
+            color: var(--browse-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .food-count {
+            display: inline-flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 13px;
+            border: 1px solid #d5e9da;
+            border-radius: 20px;
+            background: var(--browse-green-light);
+            color: var(--browse-green);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .food-count::before {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #398751;
+            content: "";
+        }
+
+
+        /* =========================================
+           FOOD FILTER PANEL
+        ========================================= */
+
+        .food-filters {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+            align-items: end;
+            margin: 0 0 30px;
+            padding: 23px;
+            border: 1px solid var(--browse-border);
+            border-radius: 19px;
+            background: var(--browse-white);
+            box-shadow: var(--browse-shadow);
+        }
+
+        .filter-heading {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #edf2ee;
+            color: var(--browse-text);
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .filter-heading-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: var(--browse-green-light);
+            font-size: 17px;
+        }
+
+        .food-filters label {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+            color: #344a3a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .food-filters select,
+        .food-filters input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            min-height: 46px;
+            padding: 11px 13px;
+            border: 1px solid #d7e2d9;
+            border-radius: 10px;
+            outline: none;
+            background: #fbfdfb;
+            color: var(--browse-text);
+            font-size: 14px;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+        }
+
+        .food-filters select:focus,
+        .food-filters input:focus {
+            border-color: var(--browse-green);
+            background: var(--browse-white);
+            box-shadow: 0 0 0 3px rgba(35, 107, 58, 0.10);
+        }
+
+        .food-filters input::placeholder {
+            color: #99a49b;
+        }
+
+        .food-filters .search-filter {
+            grid-column: 1 / -1;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            grid-column: 1 / -1;
+        }
+
+        .food-filters button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 11px 18px;
+            border: 1px solid var(--browse-green);
+            border-radius: 10px;
+            background: var(--browse-green);
+            color: var(--browse-white);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition:
+                background-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .food-filters button:hover {
+            background: var(--browse-green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(35, 107, 58, 0.16);
+        }
+
+
+        /* =========================================
+           FOOD LISTING GRID
+        ========================================= */
+
+        .food-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 23px;
+            align-items: start;
+        }
+
+        .food-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid var(--browse-border);
+            border-radius: 19px;
+            background: var(--browse-white);
+            box-shadow: var(--browse-shadow);
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+        .food-item::before {
+            position: absolute;
+            z-index: 2;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg,
+                    #236b3a,
+                    #58a76d);
+            content: "";
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s ease;
+        }
+
+        .food-item[hidden] {
+            display: none !important;
+        }
+
+        .food-item:hover {
+            transform: translateY(-5px);
+            border-color: #cfe1d2;
+            box-shadow: var(--browse-shadow-hover);
+        }
+
+        .food-item:hover::before {
+            transform: scaleX(1);
+        }
+
+
+        /* =========================================
+           FOOD IMAGE
+        ========================================= */
+
+        .food-image-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 205px;
+            background: #e8f5ed;
+        }
+
+        .food-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .food-item:hover .food-image {
+            transform: scale(1.045);
+        }
+
+        .food-image-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #eaf5ed, #f8fcf8);
+            color: #62816a;
+        }
+
+        .food-image-placeholder span {
+            font-size: 53px;
+        }
+
+        .food-image-placeholder p {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           FOOD CARD CONTENT
+        ========================================= */
+
+        .food-content {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            flex: 1;
+            min-width: 0;
+            padding: 21px;
+        }
+
+        .provider-name {
+            display: inline-flex;
+            align-items: center;
+            align-self: flex-start;
+            gap: 7px;
+            max-width: 100%;
+            margin: 0 0 12px;
+            padding: 8px 11px;
+            border: 1px solid #dcece1;
+            border-radius: 20px;
+            background: #edf7ef;
+            color: var(--browse-green);
+            font-size: 12px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .food-content h3 {
+            margin: 0 0 12px;
+            color: var(--browse-text);
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .food-summary {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 0 17px;
+            color: var(--browse-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .quantity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 11px;
+            border-radius: 9px;
+            background: #f2f7f3;
+            color: #355b40;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+
+        /* =========================================
+           PROVIDER RATINGS
+        ========================================= */
+
+        .provider-rating-summary {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0 0 16px;
+            padding: 11px 12px;
+            border: 1px solid #f0e7cb;
+            border-radius: 10px;
+            background: #fffdf6;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .rating-stars {
+            color: #926514;
+            font-weight: 800;
+        }
+
+        .rating-count {
+            color: var(--browse-muted);
+        }
+
+        .no-rating {
+            color: var(--browse-muted);
+            font-weight: 600;
+        }
+
+        .view-reviews-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            padding: 9px 12px;
+            border: 1px solid #28744f;
+            border-radius: 7px;
+            background: #28744f;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .view-reviews-button:hover {
+            background: #205b42;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================
+           VIEW DETAILS BUTTON
+        ========================================= */
+
+        .details-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px 15px;
+            border: 1px solid #cfe1d2;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--browse-green);
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .details-button:hover {
+            background: var(--browse-green-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.08);
+        }
+
+        .details-button .button-arrow {
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        .details-button:hover .button-arrow {
+            transform: translateY(2px);
+        }
+
+
+        /* =========================================
+           EXPANDED FOOD DETAILS
+        ========================================= */
+
+        .food-details {
+            display: none;
+            width: 100%;
+            min-width: 0;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8eee9;
+        }
+
+        .food-details.open {
+            display: block;
+            animation: revealDetails 0.22s ease;
+        }
+
+        @keyframes revealDetails {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .provider-details-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            margin-bottom: 14px;
+            padding: 13px;
+            border: 1px solid #dcece1;
+            border-radius: 12px;
+            background: #edf7ef;
+        }
+
+        .provider-details-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #d9efdf;
+            font-size: 21px;
+        }
+
+        .provider-details-heading>div:last-child {
+            min-width: 0;
+        }
+
+        .provider-details-name {
+            margin: 0;
+            color: var(--browse-green-dark);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .provider-details-label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--browse-muted);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .food-details>p {
+            display: grid;
+            grid-template-columns: minmax(100px, 0.85fr) minmax(0, 1.15fr);
+            align-items: start;
+            gap: 10px;
+            margin: 0;
+            padding: 11px 2px;
+            border-bottom: 1px solid #eef2ef;
+            color: var(--browse-muted);
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .food-details>p strong {
+            color: #35513c;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .food-details>p span {
+            min-width: 0;
+            color: #68766c;
+            overflow-wrap: anywhere;
+        }
+
+
+        /* NEGOTIATION FORM INPUTS */
+
+        .request-form label {
+            display: block;
+            margin: 14px 0 7px;
+            color: #344a3a;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .request-form input {
+            display: block;
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 13px;
+            border: 1px solid #d7e2d9;
+            border-radius: 10px;
+            background: #fbfdfb;
+            color: #24362a;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .request-form input:focus {
+            border-color: #236b3a;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(35, 107, 58, 0.10);
+        }
+
+        .request-form input::placeholder {
+            color: #99a49b;
+        }
+
+
+        /* =========================================
+           REQUEST FOOD BUTTON
+        ========================================= */
+
+        .request-form {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .request-form button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 48px;
+            padding: 12px 18px;
+            border: 1px solid var(--browse-green);
+            border-radius: 10px;
+            background: var(--browse-green);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 11px rgba(35, 107, 58, 0.14);
+            transition:
+                background-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .request-form button:hover {
+            background: var(--browse-green-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 17px rgba(35, 107, 58, 0.21);
+        }
+
+        .request-form button .request-arrow {
+            display: inline-block;
+            font-size: 17px;
+            transition: transform 0.2s ease;
+        }
+
+        .request-form button:hover .request-arrow {
+            transform: translateX(4px);
+        }
+
+
+        /* =========================================
+           EMPTY STATES
+        ========================================= */
+
+        .empty-food {
+            grid-column: 1 / -1;
+            padding: 45px 24px;
+            border: 1px dashed #cbdccf;
+            border-radius: 19px;
+            background: #ffffff;
+            text-align: center;
+            box-shadow: var(--browse-shadow);
+        }
+
+        .empty-food-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 17px;
+            border-radius: 20px;
+            background: var(--browse-green-light);
+            font-size: 34px;
+        }
+
+        .empty-food h3 {
+            margin: 0 0 10px;
+            color: var(--browse-green-dark);
+            font-size: 21px;
+        }
+
+        .empty-food p {
+            max-width: 480px;
+            margin: 0 auto;
+            color: var(--browse-muted);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+
+        /* =========================================
+           LOAD MORE
+        ========================================= */
+
+        .load-more-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0 10px;
+        }
+
+        .load-more-container .details-button {
+            min-width: 200px;
+            min-height: 47px;
+            padding: 12px 22px;
+            border-color: var(--browse-green);
+            background: var(--browse-green);
+            color: #ffffff;
+            box-shadow: 0 5px 14px rgba(35, 107, 58, 0.15);
+        }
+
+        .load-more-container .details-button:hover {
+            background: var(--browse-green-dark);
+            box-shadow: 0 8px 17px rgba(35, 107, 58, 0.20);
+        }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        .browse-footer {
+            margin-top: 45px;
+            padding: 22px 10px 8px;
+            border-top: 1px solid var(--browse-border);
+            color: #718078;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .browse-footer p {
+            margin: 0;
+            line-height: 1.8;
+        }
+
+
+        /* =========================================
+           MEDIUM SCREENS
+        ========================================= */
+
+        @media (max-width: 1200px) {
+            .browse-page {
+                padding: 27px 24px;
+            }
+
+            .food-list {
+                gap: 18px;
+            }
+
+            .food-content {
+                padding: 18px;
+            }
+
+            .food-image-container {
+                height: 185px;
+            }
+
+            .browse-intro {
+                padding: 32px;
+            }
+        }
+
+
+        /* =========================================
+           SMALL SCREENS
+        ========================================= */
+
+        @media (max-width: 900px) {
+            .browse-page {
+                margin-left: 210px;
+                padding: 22px 18px;
+            }
+
+            .food-list {
+                grid-template-columns: 1fr;
+            }
+
+            .food-image-container {
+                height: 230px;
+            }
+
+            .browse-hero-visual {
+                width: 105px;
+                height: 105px;
+                border-radius: 24px;
+            }
+
+            .browse-hero-visual span {
+                font-size: 55px;
+            }
+        }
+
+
+        /* =========================================
+           MOBILE SCREENS
+        ========================================= */
+
+        @media (max-width: 600px) {
+            .browse-page {
+                width: 100%;
+                margin-left: 0;
+                padding: 18px 14px;
+            }
+
+            .browse-navbar {
+                margin-bottom: 18px;
+            }
+
+            .back-dashboard {
+                min-height: 42px;
+                font-size: 13px;
+            }
+
+            .browse-intro {
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 25px;
+                padding: 25px 21px;
+                border-radius: 19px;
+            }
+
+            .browse-intro-content {
+                flex: 1;
+            }
+
+            .browse-intro .tagline {
+                margin-bottom: 13px;
+                padding: 7px 9px;
+                font-size: 9px;
+                letter-spacing: 1px;
+            }
+
+            .browse-intro h1 {
+                font-size: 27px;
+            }
+
+            .browse-intro-description {
+                font-size: 13px;
+                line-height: 1.8;
+            }
+
+            .browse-hero-visual {
+                width: 65px;
+                height: 65px;
+                flex-shrink: 0;
+                border-radius: 17px;
+            }
+
+            .browse-hero-visual span {
+                font-size: 36px;
+            }
+
+            .section-heading {
+                align-items: flex-start;
+                margin-bottom: 17px;
+            }
+
+            .section-heading h2 {
+                font-size: 19px;
+            }
+
+            .section-heading p {
+                font-size: 12px;
+            }
+
+            .food-count {
+                padding: 7px 9px;
+                font-size: 10px;
+            }
+
+            .food-filters {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-bottom: 24px;
+                padding: 17px;
+                border-radius: 15px;
+            }
+
+            .filter-heading {
+                padding-bottom: 12px;
+                font-size: 15px;
+            }
+
+            .food-filters .search-filter,
+            .filter-actions {
+                grid-column: auto;
+            }
+
+            .filter-actions {
+                justify-content: stretch;
+            }
+
+            .food-filters button {
+                width: 100%;
+            }
+
+            .food-list {
+                gap: 19px;
+            }
+
+            .food-item {
+                border-radius: 16px;
+            }
+
+            .food-image-container {
+                height: 195px;
+            }
+
+            .food-content {
+                padding: 18px;
+            }
+
+            .food-content h3 {
+                font-size: 21px;
+            }
+
+            .provider-rating-summary {
+                gap: 7px;
+            }
+
+            .food-details>p {
+                grid-template-columns: minmax(90px, 0.85fr) minmax(0, 1.15fr);
+                gap: 7px;
+            }
+
+            .browse-footer {
+                margin-top: 32px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .browse-intro {
+                padding: 21px 16px;
+            }
+
+            .browse-hero-visual {
+                width: 50px;
+                height: 50px;
+            }
+
+            .browse-hero-visual span {
+                font-size: 28px;
+            }
+
+            .browse-intro h1 {
+                font-size: 24px;
+            }
+
+            .section-heading {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .food-content {
+                padding: 15px;
+            }
+
+            .food-details>p {
+                grid-template-columns: 1fr;
+                gap: 3px;
+            }
+        }
+
+
+        /* =========================================
+           REDUCED MOTION
+        ========================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* =========================================
+   MEALMATCH — PREMIUM BROWSE FOOD EFFECTS
+========================================= */
+
+        /* 1. SMOOTH PAGE ENTRANCE */
+
+        .browse-page {
+            animation: browsePageReveal 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        }
+
+        @keyframes browsePageReveal {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* 2. PREMIUM WELCOME BANNER */
+
+        .browse-intro {
+            isolation: isolate;
+            animation: browseBannerReveal 0.65s ease both;
+            transition:
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+        @keyframes browseBannerReveal {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .browse-intro:hover {
+                border-color: rgba(255, 255, 255, 0.25);
+
+                box-shadow:
+                    0 12px 28px rgba(23, 79, 43, 0.18),
+                    0 25px 48px rgba(23, 79, 43, 0.12);
+            }
+        }
+
+
+        /* 3. FOOD FILTER PANEL */
+
+        .food-filters {
+            animation: browsePageReveal 0.65s ease both;
+
+            transition:
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-filters:hover {
+                border-color: #d1e3d4;
+                box-shadow:
+                    0 8px 22px rgba(31, 66, 46, 0.07),
+                    0 15px 32px rgba(31, 66, 46, 0.04);
+            }
+        }
+
+
+        /* 4. STAGGERED FOOD CARD ENTRANCE */
+
+        .food-item {
+            animation: browseCardReveal 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+
+            transition:
+                transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1),
+                box-shadow 0.32s ease,
+                border-color 0.32s ease;
+        }
+
+        .food-item:nth-child(3n + 1) {
+            animation-delay: 0.05s;
+        }
+
+        .food-item:nth-child(3n + 2) {
+            animation-delay: 0.12s;
+        }
+
+        .food-item:nth-child(3n + 3) {
+            animation-delay: 0.19s;
+        }
+
+        @keyframes browseCardReveal {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* 5. MORE NOTICEABLE FOOD CARD HOVER */
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-item:hover {
+                transform: translateY(-8px);
+
+                border-color: #b5d8bd;
+
+                box-shadow:
+                    0 8px 18px rgba(35, 107, 58, 0.06),
+                    0 22px 42px rgba(35, 107, 58, 0.12),
+                    0 0 0 1px rgba(72, 169, 104, 0.07);
+            }
+
+            .food-item:hover::before {
+                transform: scaleX(1);
+            }
+        }
+
+
+        /* 6. SMOOTH FOOD IMAGE ZOOM */
+
+        .food-image {
+            transform: scale(1);
+
+            transition:
+                transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1),
+                filter 0.4s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-item:hover .food-image {
+                transform: scale(1.07);
+                filter: saturate(1.08);
+            }
+        }
+
+
+        /* 7. FOOD TITLE HIGHLIGHT */
+
+        .food-content h3 {
+            transition:
+                color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-item:hover .food-content h3 {
+                color: #236b3a;
+                transform: translateX(3px);
+            }
+        }
+
+
+        /* 8. PROVIDER BADGE MICRO-INTERACTION */
+
+        .provider-name {
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-item:hover .provider-name {
+                background: #e2f2e6;
+                border-color: #c4e0cb;
+                transform: translateY(-2px);
+            }
+        }
+
+
+        /* 9. QUANTITY BADGE MICRO-INTERACTION */
+
+        .quantity-badge {
+            transition:
+                background-color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-item:hover .quantity-badge {
+                background: #e7f3e9;
+                transform: translateY(-1px);
+            }
+        }
+
+
+        /* 10. PROVIDER RATING PANEL */
+
+        .provider-rating-summary {
+            transition:
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .food-item:hover .provider-rating-summary {
+                border-color: #e7d9ae;
+                box-shadow: 0 4px 10px rgba(146, 101, 20, 0.05);
+            }
+        }
+
+
+        /* 11. POLISHED DETAILS BUTTON */
+
+        .details-button {
+            position: relative;
+            overflow: hidden;
+
+            transition:
+                background-color 0.22s ease,
+                color 0.22s ease,
+                transform 0.22s ease,
+                box-shadow 0.22s ease,
+                border-color 0.22s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .details-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 7px 16px rgba(35, 107, 58, 0.13);
+            }
+        }
+
+
+        /* 12. GREEN BUTTON SHIMMER */
+
+        .back-dashboard,
+        .food-filters button,
+        .request-form button,
+        .load-more-container .details-button {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+
+        .back-dashboard::before,
+        .food-filters button::before,
+        .request-form button::before,
+        .load-more-container .details-button::before {
+            position: absolute;
+            top: 0;
+            left: -130%;
+
+            width: 65%;
+            height: 100%;
+
+            background: linear-gradient(110deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.24),
+                    transparent);
+
+            content: "";
+            transform: skewX(-22deg);
+            transition: left 0.65s ease;
+            pointer-events: none;
+        }
+
+        .back-dashboard:hover::before,
+        .food-filters button:hover::before,
+        .request-form button:hover::before,
+        .load-more-container .details-button:hover::before {
+            left: 150%;
+        }
+
+
+        /* Keep button labels above the shimmer */
+
+        .back-dashboard>*,
+        .food-filters button>*,
+        .request-form button>*,
+        .load-more-container .details-button>* {
+            position: relative;
+            z-index: 1;
+        }
+
+
+        /* 13. REQUEST BUTTON — PREMIUM LIFT */
+
+        .request-form button {
+            transition:
+                background-color 0.22s ease,
+                transform 0.22s ease,
+                box-shadow 0.22s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .request-form button:hover {
+                transform: translateY(-3px);
+                box-shadow:
+                    0 8px 17px rgba(35, 107, 58, 0.21),
+                    0 0 0 1px rgba(72, 169, 104, 0.08);
+            }
+        }
+
+
+        /* 14. BUTTON PRESS FEEDBACK */
+
+        .back-dashboard:active,
+        .food-filters button:active,
+        .details-button:active,
+        .request-form button:active,
+        .view-reviews-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+
+        /* 15. FILTER INPUT FOCUS EFFECT */
+
+        .food-filters input,
+        .food-filters select {
+            transition:
+                border-color 0.22s ease,
+                box-shadow 0.22s ease,
+                background-color 0.22s ease,
+                transform 0.22s ease;
+        }
+
+        .food-filters input:focus,
+        .food-filters select:focus {
+            transform: translateY(-1px);
+        }
+
+
+        /* 16. EXPANDED DETAILS REVEAL */
+
+        .food-details.open {
+            animation: browseDetailsReveal 0.28s ease both;
+        }
+
+        @keyframes browseDetailsReveal {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* 17. EMPTY STATE HOVER */
+
+        .empty-food {
+            transition:
+                border-color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .empty-food-icon {
+            transition:
+                transform 0.3s ease,
+                background-color 0.3s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .empty-food:not([hidden]):hover {
+                border-color: #8fc69b;
+
+                box-shadow:
+                    0 12px 28px rgba(35, 107, 58, 0.07),
+                    0 0 0 1px rgba(72, 169, 104, 0.04);
+
+                transform: translateY(-3px);
+            }
+
+            .empty-food:not([hidden]):hover .empty-food-icon {
+                transform: translateY(-3px) rotate(-4deg);
+                background: #e0f2e4;
+            }
+        }
+
+
+        /* 18. LOAD MORE BUTTON */
+
+        .load-more-container .details-button {
+            transition:
+                background-color 0.22s ease,
+                transform 0.22s ease,
+                box-shadow 0.22s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .load-more-container .details-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 9px 20px rgba(35, 107, 58, 0.22);
+            }
+        }
+
+
+        /* 19. BACK TO DASHBOARD BUTTON */
+
+        .back-dashboard {
+            transition:
+                background-color 0.22s ease,
+                color 0.22s ease,
+                transform 0.22s ease,
+                box-shadow 0.22s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .back-dashboard:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 7px 16px rgba(35, 107, 58, 0.18);
+            }
+        }
+
+
+        /* 20. FOOTER REVEAL */
+
+        .browse-footer {
+            animation: browsePageReveal 0.7s ease both;
+            animation-delay: 0.15s;
+        }
+
+
+        /* 21. ACCESSIBILITY — RESPECT REDUCED MOTION */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .browse-page,
+            .browse-intro,
+            .food-filters,
+            .food-item,
+            .browse-footer,
+            .food-details.open {
+                animation: none !important;
+            }
+
+            .browse-page *,
+            .browse-page *::before,
+            .browse-page *::after {
+                animation: none !important;
+                transition: none !important;
+                transform: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        .expiry-warning {
+            display: inline-block;
+            margin: 8px 0 0;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fff3df;
+            color: #8a5700;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .expiry-warning[hidden] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="browse-page">
+
+        <!-- TOP NAVIGATION -->
+
+        <header class="browse-navbar">
+            <a href="{{ url_for('dashboard') }}" class="back-dashboard">
+                <span aria-hidden="true">←</span>
+                Back to Dashboard
+            </a>
+        </header>
+
+
+        <!-- SUCCESS MESSAGE -->
+
+        {% if request.args.get('requested') == '1' %}
+
+        <div class="request-success" role="status">
+            <span class="success-icon" aria-hidden="true">✓</span>
+
+            <span>
+                Food request sent successfully!
+                The provider can now review it.
+            </span>
+        </div>
+
+        {% endif %}
+
+
+        <!-- WELCOME BANNER -->
+
+        <section class="browse-intro">
+
+            <div class="browse-intro-content">
+
+                <p class="tagline">
+                    <span aria-hidden="true">✦</span>
+                    FIND FOOD. MAKE A DIFFERENCE.
+                </p>
+
+                <h1>Available Surplus Food 🌿</h1>
+
+                <p class="browse-intro-description">
+                    Discover available meals from food providers, find food
+                    that meets your requirements, and help good food reach
+                    the people who need it.
+                </p>
+
+            </div>
+
+            <div class="browse-hero-visual" aria-hidden="true">
+                <span>🍱</span>
+            </div>
+
+        </section>
+
+
+        <!-- SECTION HEADING -->
+
+        <div class="section-heading">
+
+            <div class="section-heading-content">
+
+                <h2>Explore Available Meals</h2>
+
+                <p>
+                    Find suitable food and connect with providers.
+                </p>
+
+            </div>
+
+            <span class="food-count" aria-live="polite">
+                {{ food_listings|length }}
+                listing{% if food_listings|length != 1 %}s{% endif %}
+            </span>
+
+        </div>
+
+
+        <!-- FOOD FILTERS -->
+
+        <section class="food-filters" aria-label="Food search and filters">
+
+            <h3 class="filter-heading">
+                <span class="filter-heading-icon" aria-hidden="true">⌕</span>
+                Find Your Food
+            </h3>
+
+            <label class="search-filter">
+                Search Food
+
+                <input id="foodSearch" type="search" placeholder="Search food, provider, or location"
+                    autocomplete="off">
+            </label>
+
+            <label>
+                Food Category
+
+                <select id="categoryFilter">
+                    <option value="">All categories</option>
+                    <option value="Indian">Indian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Snacks & Fast Food">Snacks &amp; Fast Food</option>
+                    <option value="Healthy Food">Healthy Food</option>
+                    <option value="Desserts & Sweets">Desserts &amp; Sweets</option>
+                    <option value="Bakery">Bakery</option>
+                    <option value="Other">Other</option>
+                </select>
+            </label>
+
+            <label>
+                Food Type
+
+                <select id="typeFilter">
+                    <option value="">All types</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                    <option value="Vegan">Vegan</option>
+                </select>
+            </label>
+
+            <label>
+                Maximum Price per Meal (₹)
+
+                <input id="priceFilter" type="number" min="0" step="0.01" placeholder="Any price">
+            </label>
+
+            <label>
+                Minimum Quantity
+
+                <input id="quantityFilter" type="number" min="0" step="1" placeholder="Any quantity">
+            </label>
+
+            <div class="filter-actions">
+                <button type="button" id="resetFilters">
+                    ↺ Clear Filters
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- FOOD LISTINGS -->
+
+        <section class="food-list" id="foodList" aria-label="Available food listings">
+
+            {% for food in food_listings %}
+
+            <article class="food-item" id="food-{{ food.id }}" data-listing-id="{{ food.id }}"
+                data-available-until="{{ food.available_until.strftime('%Y-%m-%dT%H:%M:%S') if food.available_until else '' }}"
+                data-search="{{ food.food_name }} {{ food.organisation_name or '' }} {{ food.location }}"
+                data-category="{{ food.food_category or '' }}" data-type="{{ food.food_type or '' }}"
+                data-price="{{ food.price if food.price is not none else 0 }}" data-quantity="{{ food.quantity or 0 }}"
+                {% if loop.index> 4 %}hidden{% endif %}
+                >
+
+                <!-- FOOD IMAGE -->
+
+                <div class="food-image-container">
+
+                    {% if food.image_filename %}
+
+                    <img class="food-image" src="{{ url_for('static', filename='uploads/' ~ food.image_filename) }}"
+                        alt="{{ food.food_name }}" loading="lazy"
+                        onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
+
+                    <div class="food-image-placeholder" hidden>
+                        <span aria-hidden="true">🍱</span>
+                        <p>Food image unavailable</p>
+                    </div>
+
+                    {% else %}
+
+                    <div class="food-image-placeholder">
+                        <span aria-hidden="true">🍱</span>
+                        <p>No image available</p>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- FOOD CONTENT -->
+
+                <div class="food-content">
+
+                    <p class="provider-name">
+                        <span aria-hidden="true">🏢</span>
+                        {{ food.organisation_name or 'Food Provider' }}
+                    </p>
+
+                    <h3>{{ food.food_name }}</h3>
+
+                    <p class="food-summary">
+                        <span class="quantity-badge">
+                            🍽️ {{ food.quantity }} meals available
+                        </span>
+                    </p>
+
+                    <p class="expiry-warning" hidden>⏰ Pickup deadline soon</p>
+
+
+                    <!-- PROVIDER RATING -->
+
+                    <div class="provider-rating-summary">
+
+                        {% if food.review_count is defined and food.review_count > 0 %}
+
+                        <span class="rating-stars">
+                            ⭐ {{ food.average_rating }}/5
+                        </span>
+
+                        <span class="rating-count">
+                            ({{ food.review_count }} reviews)
+                        </span>
+
+                        <a href="{{ url_for('view_provider_reviews', provider_id=food.provider_id) }}"
+                            class="view-reviews-button">
+                            View Reviews →
+                        </a>
+
+                        {% else %}
+
+                        <span class="no-rating">
+                            ⭐ No ratings yet
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- VIEW DETAILS BUTTON -->
+
+                    <button type="button" class="details-button" aria-expanded="false" onclick="toggleDetails(this)">
+                        View Details
+                        <span class="button-arrow" aria-hidden="true">↓</span>
+                    </button>
+
+
+                    <!-- EXPANDED DETAILS -->
+
+                    <div class="food-details">
+
+                        <!-- PROVIDER ORGANISATION -->
+
+                        <div class="provider-details-heading">
+
+                            <div class="provider-details-icon" aria-hidden="true">
+                                🏢
+                            </div>
+
+                            <div>
+
+                                <span class="provider-details-label">
+                                    Food Provider
+                                </span>
+
+                                <p class="provider-details-name">
+                                    {{ food.organisation_name or 'Organisation name unavailable' }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- FOOD NAME -->
+
+                        <p>
+                            <strong>Food Name:</strong>
+                            <span>{{ food.food_name }}</span>
+                        </p>
+
+
+                        <!-- FOOD CATEGORY -->
+
+                        <p>
+                            <strong>Food Category:</strong>
+                            <span>{{ food.food_category or 'Not specified' }}</span>
+                        </p>
+
+
+                        <!-- FOOD TYPE -->
+
+                        <p>
+                            <strong>Food Type:</strong>
+                            <span>{{ food.food_type or 'Not specified' }}</span>
+                        </p>
+
+
+                        <!-- PRICE -->
+
+                        <p>
+                            <strong>Price per Box:</strong>
+
+                            <span>
+                                {% if food.price is defined and food.price is not none %}
+                                ₹{{ food.price }} per box
+                                {% else %}
+                                Not specified
+                                {% endif %}
+                            </span>
+                        </p>
+
+
+                        <!-- QUANTITY -->
+
+                        <p>
+                            <strong>Quantity:</strong>
+                            <span>{{ food.quantity }} meals</span>
+                        </p>
+
+
+                        <!-- PICKUP LOCATION -->
+
+                        <p>
+                            <strong>Pickup Location:</strong>
+                            <span>{{ food.location }}</span>
+                        </p>
+
+
+                        <!-- AVAILABILITY -->
+
+                        <p>
+                            <strong>Available Until:</strong>
+                            <span>{{ food.available_until or 'Not specified' }}</span>
+                        </p>
+
+
+                        <!-- REQUEST FOOD OPTIONS -->
+
+                        <div class="request-options">
+
+                            <!-- OPTION 1: REQUEST LISTED QUANTITY -->
+
+                            <form class="request-form" action="/request-food/{{ food.id }}" method="POST">
+                                <input type="hidden" name="request_type" value="normal">
+
+                                <button type="submit">
+                                    Request Listed Quantity
+                                    <span class="request-arrow" aria-hidden="true">→</span>
+                                </button>
+                            </form>
+
+
+                            <!-- OPTION 2: NEGOTIATE QUANTITY AND PRICE WITH AI -->
+
+                            <form class="request-form" action="/request-food/{{ food.id }}" method="POST">
+
+                                <input type="hidden" name="request_type" value="negotiate">
+
+                                <!-- REQUIRED QUANTITY -->
+
+                                <label for="proposed-quantity-{{ food.id }}">
+                                    Your Required Quantity
+                                </label>
+
+                                <input type="number" id="proposed-quantity-{{ food.id }}" name="proposed_quantity"
+                                    placeholder="Enter meals required" min="1" max="{{ food.quantity | int - 1 }}"
+                                    step="1" required>
+
+                                <!-- PROPOSED PRICE -->
+
+                                <label for="proposed-price-{{ food.id }}">
+                                    Your Proposed Price per Box (₹)
+                                </label>
+
+                                <input type="number" id="proposed-price-{{ food.id }}" name="proposed_price"
+                                    placeholder="Enter your proposed price" min="0" step="0.01" required>
+
+                                <!-- SUBMIT PROPOSAL -->
+
+                                <button type="submit" class="ai-negotiate-button">
+                                    Negotiate Quantity & Price with AI 🤖
+                                    <span class="request-arrow" aria-hidden="true">→</span>
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        <!-- EMPTY STATE -->
+
+        {% if not food_listings %}
+
+        <div class="empty-food">
+
+            <div class="empty-food-icon" aria-hidden="true">
+                🍃
+            </div>
+
+            <h3>No Food Listings Available</h3>
+
+            <p>
+                There are no available food listings right now.
+                Please check again later for new meals from providers.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- FILTER NO-RESULTS MESSAGE -->
+
+        <div class="empty-food" id="filterNoResults" hidden>
+
+            <div class="empty-food-icon" aria-hidden="true">
+                🔎
+            </div>
+
+            <h3>No Matching Food Found</h3>
+
+            <p>
+                Try changing your search or adjusting your filters
+                to discover other available meals.
+            </p>
+
+        </div>
+
+
+        <!-- LOAD MORE -->
+
+        {% if food_listings|length > 4 %}
+
+        <div class="load-more-container">
+
+            <button type="button" id="loadMoreButton" class="details-button" onclick="loadMoreFood()">
+                Load More Food
+                <span aria-hidden="true">↓</span>
+            </button>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- FOOTER -->
+
+        <footer class="browse-footer">
+
+            <p>
+                Together, we can reduce food waste. 💚
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <script>
+        /* =========================================
+           FOOD LISTING ELEMENTS
+        ========================================= */
+
+        let foodItems = Array.from(
+            document.querySelectorAll("#foodList .food-item")
+        );
+
+        const categoryFilter = document.getElementById("categoryFilter");
+        const foodSearch = document.getElementById("foodSearch");
+        const typeFilter = document.getElementById("typeFilter");
+        const priceFilter = document.getElementById("priceFilter");
+        const quantityFilter = document.getElementById("quantityFilter");
+        const resetFiltersButton = document.getElementById("resetFilters");
+        const foodCount = document.querySelector(".food-count");
+        const loadMoreButton = document.getElementById("loadMoreButton");
+        const foodList = document.getElementById("foodList");
+        const filterNoResults = document.getElementById("filterNoResults");
+
+        let visibleLimit = 4;
+
+
+        /* =========================================
+           VIEW / HIDE FOOD DETAILS
+        ========================================= */
+
+        function toggleDetails(button) {
+            const card = button.closest(".food-item");
+
+            if (!card) {
+                return;
+            }
+
+            const details = card.querySelector(".food-details");
+
+            if (!details) {
+                return;
+            }
+
+            const isOpen = details.classList.toggle("open");
+
+            button.setAttribute("aria-expanded", String(isOpen));
+
+            button.innerHTML = isOpen
+                ? 'Hide Details <span class="button-arrow" aria-hidden="true">↑</span>'
+                : 'View Details <span class="button-arrow" aria-hidden="true">↓</span>';
+        }
+
+
+        /* =========================================
+           APPLY SEARCH AND FILTERS
+        ========================================= */
+
+        function applyFoodFilters(resetVisibleLimit = true) {
+
+            if (resetVisibleLimit) {
+                visibleLimit = 4;
+            }
+
+            const searchTerm = foodSearch.value.trim().toLowerCase();
+
+            const selectedCategory =
+                categoryFilter.value.trim().toLowerCase();
+
+            const selectedType =
+                typeFilter.value.trim().toLowerCase();
+
+            const maximumPrice = priceFilter.value.trim() === ""
+                ? null
+                : Number(priceFilter.value);
+
+            const minimumQuantity = quantityFilter.value.trim() === ""
+                ? null
+                : Number(quantityFilter.value);
+
+
+            /* Get only cards that still exist in the page */
+
+            foodItems = foodItems.filter(item => item.isConnected);
+
+
+            /* Find matching listings */
+
+            const matchingItems = foodItems.filter(item => {
+
+                const searchableText =
+                    (item.dataset.search || "").toLowerCase();
+
+                const category =
+                    (item.dataset.category || "").toLowerCase();
+
+                const type =
+                    (item.dataset.type || "").toLowerCase();
+
+                const price =
+                    Number(item.dataset.price || 0);
+
+                const quantity =
+                    Number(item.dataset.quantity || 0);
+
+
+                const matchesSearch =
+                    !searchTerm || searchableText.includes(searchTerm);
+
+                const matchesCategory =
+                    !selectedCategory || category === selectedCategory;
+
+                const matchesType =
+                    !selectedType || type === selectedType;
+
+                const matchesPrice =
+                    maximumPrice === null ||
+                    (Number.isFinite(maximumPrice) && price <= maximumPrice);
+
+                const matchesQuantity =
+                    minimumQuantity === null ||
+                    (
+                        Number.isFinite(minimumQuantity) &&
+                        quantity >= minimumQuantity
+                    );
+
+
+                return (
+                    matchesSearch &&
+                    matchesCategory &&
+                    matchesType &&
+                    matchesPrice &&
+                    matchesQuantity
+                );
+            });
+
+
+            /* Show matching cards within the current limit */
+
+            foodItems.forEach(item => {
+
+                const matchingIndex = matchingItems.indexOf(item);
+
+                item.hidden =
+                    matchingIndex === -1 ||
+                    matchingIndex >= visibleLimit;
+
+            });
+
+
+            /* Update the listing count */
+
+            if (foodCount) {
+
+                const count = matchingItems.length;
+
+                foodCount.textContent =
+                    `${count} listing${count === 1 ? "" : "s"}`;
+            }
+
+
+            /* Show or hide Load More */
+
+            if (loadMoreButton) {
+
+                loadMoreButton.parentElement.style.display =
+                    matchingItems.length > visibleLimit ? "flex" : "none";
+            }
+
+
+            /* Show the no-results message when needed */
+
+            if (filterNoResults) {
+
+                filterNoResults.hidden =
+                    matchingItems.length !== 0 || foodItems.length === 0;
+            }
+        }
+
+
+        /* =========================================
+           LOAD MORE FOOD
+        ========================================= */
+
+        function loadMoreFood() {
+
+            visibleLimit += 4;
+
+            applyFoodFilters(false);
+        }
+
+
+        /* =========================================
+           FILTER EVENT LISTENERS
+        ========================================= */
+
+        foodSearch.addEventListener("input", () => applyFoodFilters());
+
+        categoryFilter.addEventListener(
+            "change",
+            () => applyFoodFilters()
+        );
+
+        typeFilter.addEventListener(
+            "change",
+            () => applyFoodFilters()
+        );
+
+        priceFilter.addEventListener(
+            "input",
+            () => applyFoodFilters()
+        );
+
+        quantityFilter.addEventListener(
+            "input",
+            () => applyFoodFilters()
+        );
+
+
+        /* =========================================
+           CLEAR ALL FILTERS
+        ========================================= */
+
+        resetFiltersButton.addEventListener("click", () => {
+
+            foodSearch.value = "";
+            categoryFilter.value = "";
+            typeFilter.value = "";
+            priceFilter.value = "";
+            quantityFilter.value = "";
+
+            applyFoodFilters();
+        });
+
+
+        /* =========================================
+           REMOVE EXPIRED LISTINGS
+        ========================================= */
+
+        function removeExpiredFoodCards() {
+            const now = Date.now();
+            let removedAny = false;
+
+            foodItems.forEach(card => {
+                const expiryValue = card.dataset.availableUntil;
+                const warning = card.querySelector(".expiry-warning");
+
+                if (!expiryValue) {
+                    return;
+                }
+
+                const expiryTime = Date.parse(expiryValue);
+
+                if (!Number.isFinite(expiryTime)) {
+                    return;
+                }
+
+                const timeLeft = expiryTime - now;
+
+                // Show the warning only when 1 hour or less remains.
+                if (warning) {
+                    warning.hidden = !(timeLeft > 0 && timeLeft <= 60 * 60 * 1000);
+                }
+
+                // Remove the listing once its deadline has passed.
+                if (timeLeft <= 0) {
+                    card.remove();
+                    removedAny = true;
+                }
+            });
+
+            if (removedAny) {
+                foodItems = foodItems.filter(item => item.isConnected);
+                applyFoodFilters();
+            }
+        }
+
+
+        /* =========================================
+           INITIAL PAGE SETUP
+        ========================================= */
+
+        applyFoodFilters();
+
+        removeExpiredFoodCards();
+
+        window.setInterval(removeExpiredFoodCards, 1000);
+
+
+        /* =========================================
+           SCROLL TO SUCCESS MESSAGE
+        ========================================= */
+
+        window.addEventListener("load", function () {
+
+            const message = document.querySelector(".request-success");
+
+            if (message) {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "auto"
+                });
+            }
+        });
+
+        // ==========================================
+        // OPEN THE EXACT FOOD LISTING FROM AI MATCHES
+        // ==========================================
+
+        function openFoodListingFromHash() {
+
+            const listingId = window.location.hash;
+
+            if (!listingId || !listingId.startsWith("#food-")) {
+                return;
+            }
+
+            const targetCard = document.querySelector(listingId);
+
+            if (!targetCard) {
+                return;
+            }
+
+            // Reveal the selected card if it is initially hidden.
+            targetCard.hidden = false;
+
+            // Reveal the card even if existing filters hide it.
+            targetCard.style.display = "";
+
+            // Scroll to the exact selected listing.
+            targetCard.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            // Highlight the selected listing briefly.
+            targetCard.style.transition =
+                "box-shadow 0.3s ease, border-color 0.3s ease";
+
+            targetCard.style.borderColor = "#236B3A";
+            targetCard.style.boxShadow =
+                "0 0 0 3px rgba(35, 107, 58, 0.18)";
+
+            // Remove the highlight after a short delay.
+            setTimeout(function () {
+                targetCard.style.borderColor = "";
+                targetCard.style.boxShadow = "";
+            }, 3000);
+        }
+
+
+        // Run when Browse Food opens.
+        document.addEventListener("DOMContentLoaded", function () {
+            openFoodListingFromHash();
+        });
+
+    </script>
+
+</body>
+
+</html>

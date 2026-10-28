@@ -1,0 +1,163 @@
+<aside class="sidebar">
+
+    <!-- MealMatch Logo -->
+
+    <div class="sidebar-brand">
+        <a href="{{ url_for('dashboard') }}" class="sidebar-logo-link">
+            <img src="{{ url_for('static', filename='mealmatch-logo.jpg') }}" alt="MealMatch Logo" class="sidebar-logo">
+        </a>
+    </div>
+
+
+    <!-- Provider Menu -->
+
+    {% if session.get('role') == 'provider' %}
+
+    <p class="sidebar-label">MAIN MENU</p>
+
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+        <span class="sidebar-icon">⌂</span>
+        <span>Dashboard</span>
+    </a>
+
+    <!-- AI Agent -->
+
+    <a href="{{ url_for('ai_agent') }}" class="sidebar-link {% if request.endpoint == 'ai_agent' %}active{% endif %}">
+        <span class="sidebar-icon">✦</span>
+        <span>AI Agent</span>
+    </a>
+
+    <a href="{{ url_for('share_food') }}"
+        class="sidebar-link {% if request.endpoint == 'share_food' %}active{% endif %}">
+        <span class="sidebar-icon">＋</span>
+        <span>Share Food</span>
+    </a>
+
+    <a href="{{ url_for('my_food_listings') }}"
+        class="sidebar-link {% if request.endpoint == 'my_food_listings' %}active{% endif %}">
+        <span class="sidebar-icon">▤</span>
+        <span>My Food Listings</span>
+    </a>
+
+    <a href="{{ url_for('provider_requests') }}"
+        class="sidebar-link {% if request.endpoint == 'provider_requests' %}active{% endif %}">
+        <span class="sidebar-icon">↙</span>
+        <span>Incoming Requests</span>
+    </a>
+
+    <a href="{{ url_for('provider_chats') }}"
+        class="sidebar-link {% if request.endpoint == 'provider_chats' %}active{% endif %}">
+        <span class="sidebar-icon">☏</span>
+        <span>Chat with Receivers</span>
+    </a>
+
+    <a href="{{ url_for('notifications') }}"
+        class="sidebar-link {% if request.endpoint == 'notifications' %}active{% endif %}">
+        <span class="sidebar-icon notification-sidebar-icon">
+            ♧
+            {% if unread_notification_count > 0 %}
+            <span class="notification-badge">
+                {{ unread_notification_count if unread_notification_count < 4 else '3+' }} </span>
+                    {% endif %}
+            </span>
+            <span>Notifications</span>
+    </a>
+
+
+    <!-- Receiver Menu -->
+
+    {% elif session.get('role') == 'ngo' %}
+
+    <p class="sidebar-label">MAIN MENU</p>
+
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+        <span class="sidebar-icon">⌂</span>
+        <span>Dashboard</span>
+    </a>
+
+    <!-- AI Agent -->
+
+    <a href="{{ url_for('ai_agent') }}" class="sidebar-link {% if request.endpoint == 'ai_agent' %}active{% endif %}">
+        <span class="sidebar-icon">✦</span>
+        <span>AI Agent</span>
+    </a>
+
+    <a href="{{ url_for('browse_food') }}"
+        class="sidebar-link {% if request.endpoint == 'browse_food' %}active{% endif %}">
+        <span class="sidebar-icon">⌕</span>
+        <span>Browse Food</span>
+    </a>
+
+    <a href="{{ url_for('my_requests') }}"
+        class="sidebar-link {% if request.endpoint == 'my_requests' %}active{% endif %}">
+        <span class="sidebar-icon">▤</span>
+        <span>My Food Requests</span>
+    </a>
+
+    <a href="{{ url_for('receiver_chats') }}"
+        class="sidebar-link {% if request.endpoint == 'receiver_chats' %}active{% endif %}">
+        <span class="sidebar-icon">☏</span>
+        <span>Chat with Providers</span>
+    </a>
+
+    <a href="{{ url_for('notifications') }}"
+        class="sidebar-link {% if request.endpoint == 'notifications' %}active{% endif %}">
+        <span class="sidebar-icon notification-sidebar-icon">
+            ♧
+            {% if unread_notification_count > 0 %}
+            <span class="notification-badge">
+                {{ unread_notification_count if unread_notification_count < 4 else '3+' }} </span>
+                    {% endif %}
+            </span>
+            <span>Notifications</span>
+    </a>
+
+    {% endif %}
+
+
+    <!-- Account -->
+
+    <div class="sidebar-account">
+
+        <p class="sidebar-label">ACCOUNT</p>
+
+        <a href="{{ url_for('profile') }}" class="sidebar-link {% if request.endpoint == 'profile' %}active{% endif %}">
+            <span class="sidebar-icon">♙</span>
+            <span>My Profile</span>
+        </a>
+
+    </div>
+
+
+    <!-- User Details and Logout -->
+
+    <div class="sidebar-bottom">
+
+        <div class="sidebar-user">
+
+            <div class="user-avatar">
+                {{ session.get('name', 'U')[0]|upper }}
+            </div>
+
+            <div class="user-details">
+                <strong>{{ session.get('name', 'User') }}</strong>
+
+                <span>
+                    {% if session.get('role') == 'provider' %}
+                    Food Provider
+                    {% else %}
+                    Receiver
+                    {% endif %}
+                </span>
+            </div>
+
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="sidebar-logout">
+            <span>↪</span>
+            <span>Logout</span>
+        </a>
+
+    </div>
+
+</aside>

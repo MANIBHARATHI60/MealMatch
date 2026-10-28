@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Provider Reviews | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .reviews-page {
+            margin-left: 250px;
+            padding: 35px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background: #f2f6f3;
+            color: #26352b;
+        }
+
+        .reviews-header {
+            margin-bottom: 25px;
+        }
+
+        .reviews-header h1 {
+            color: #236B3A;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .reviews-header p {
+            color: #68756b;
+            line-height: 1.6;
+        }
+
+        .reviews-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .review-card {
+            background: #ffffff;
+            padding: 22px;
+            border: 1px solid #e3ebe2;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            overflow-wrap: anywhere;
+        }
+
+        .review-card h3 {
+            margin: 0 0 10px;
+            color: #26352b;
+            font-size: 18px;
+        }
+
+        .review-stars {
+            color: #d99a00;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .review-comment {
+            color: #59665d;
+            line-height: 1.7;
+            margin: 12px 0;
+        }
+
+        .review-date {
+            color: #879188;
+            font-size: 13px;
+        }
+
+        .empty-reviews {
+            padding: 30px;
+            background: #ffffff;
+            border: 1px dashed #b9d9c4;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 18px;
+            background: #236B3A;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: #184f2b;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 900px) {
+            .reviews-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reviews-page {
+                margin-left: 210px;
+                padding: 20px;
+            }
+
+            .reviews-header h1 {
+                font-size: 26px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .reviews-page {
+                margin-left: 0;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="reviews-page">
+
+        <header class="reviews-header">
+            <h1>⭐ Provider Reviews</h1>
+
+            <p>
+                Ratings and feedback for
+                <strong>
+                    {{ provider.organisation_name or 'Food Provider' }}
+                </strong>
+            </p>
+
+            <p>
+                Read feedback from receivers who have rated this provider.
+            </p>
+        </header>
+
+        {% if reviews %}
+
+        <section class="reviews-list">
+
+            {% for review in reviews %}
+
+            <article class="review-card">
+
+                <h3>
+                    {{ review.reviewer_name or 'Receiver' }}
+                </h3>
+
+                <div class="review-stars" aria-label="{{ review.rating }} out of 5 stars">
+
+                    {% for star in range(1, 6) %}
+                    {% if star <= review.rating %} ★ {% else %} ☆ {% endif %} {% endfor %} <span> {{ review.rating }}/5
+                        </span>
+
+                </div>
+
+                <p class="review-comment">
+                    {{ review.review or 'No written comment provided.' }}
+                </p>
+
+                <p class="review-date">
+                    {{ review.created_at.strftime('%d %b %Y') if review.created_at else '' }}
+                </p>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+        {% else %}
+
+        <section class="empty-reviews">
+            <h2>No Reviews Yet</h2>
+
+            <p>
+                This provider has not received any ratings or comments yet.
+            </p>
+        </section>
+
+        {% endif %}
+
+        <a href="{{ url_for('browse_food') }}" class="back-button">
+            ← Back to Browse Food
+        </a>
+
+    </main>
+
+</body>
+
+</html>

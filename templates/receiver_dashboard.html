@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Receiver Dashboard | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* =====================================
+           RECEIVER DASHBOARD — PREMIUM DESIGN
+        ===================================== */
+
+        .dashboard-container {
+            --rd-green: #236b3a;
+            --rd-green-dark: #184f2b;
+            --rd-green-light: #eaf5ed;
+            --rd-text: #24362a;
+            --rd-muted: #68766c;
+            --rd-border: #e5ece6;
+
+            max-width: 1500px;
+            margin: 0 0 0 250px;
+            padding: 32px;
+            box-sizing: border-box;
+            min-height: 100vh;
+            color: var(--rd-text);
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard-container *,
+        .dashboard-container *::before,
+        .dashboard-container *::after {
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================
+           WELCOME BANNER
+        ===================================== */
+
+        .welcome-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+
+            padding: 38px;
+            margin-bottom: 32px;
+
+            background:
+                radial-gradient(circle at 90% 15%,
+                    rgba(255, 255, 255, 0.12),
+                    transparent 35%),
+                linear-gradient(125deg,
+                    #174f2b,
+                    #236b3a 60%,
+                    #398751);
+
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 25px;
+
+            box-shadow: 0 12px 30px rgba(24, 79, 43, 0.16);
+            overflow: hidden;
+
+            animation: rdFadeIn 0.6s ease both;
+        }
+
+        .welcome-section::before,
+        .welcome-section::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .welcome-section::before {
+            width: 330px;
+            height: 330px;
+            top: -210px;
+            right: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow:
+                0 0 0 25px rgba(255, 255, 255, 0.025),
+                0 0 0 55px rgba(255, 255, 255, 0.02);
+        }
+
+        .welcome-section::after {
+            width: 210px;
+            height: 210px;
+            right: -75px;
+            bottom: -130px;
+            border: 32px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .welcome-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 8px 13px;
+            margin-bottom: 17px;
+
+            color: #e1f4e5;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 30px;
+
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+
+        .welcome-label::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            flex-shrink: 0;
+
+            background: #9be6aa;
+            border-radius: 50%;
+            box-shadow: 0 0 9px rgba(155, 230, 170, 0.65);
+        }
+
+        .welcome-section h1 {
+            margin: 0 0 16px;
+            color: #fff;
+            font-size: clamp(29px, 3vw, 42px);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -1.1px;
+            overflow-wrap: anywhere;
+        }
+
+        .welcome-section p {
+            max-width: 620px;
+            margin: 0;
+
+            color: #e0efe3;
+            font-size: 15px;
+            line-height: 1.9;
+        }
+
+
+        /* =====================================
+           WELCOME IMAGE
+        ===================================== */
+
+        .welcome-image-frame {
+            position: relative;
+            z-index: 1;
+
+            flex-shrink: 0;
+            padding: 8px;
+
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 21px;
+
+            transform: rotate(2deg);
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-image {
+            display: block;
+
+            width: 205px;
+            height: 160px;
+
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .welcome-image-frame:hover {
+                transform: rotate(0deg) translateY(-3px);
+            }
+        }
+
+
+        /* =====================================
+           SECTION HEADING
+        ===================================== */
+
+        .dashboard-section-heading {
+            margin: 0 0 22px;
+        }
+
+        .dashboard-section-heading h2 {
+            margin: 0 0 7px;
+            color: var(--rd-text);
+            font-size: 24px;
+        }
+
+        .dashboard-section-heading p {
+            margin: 0;
+            color: var(--rd-muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+
+        /* =====================================
+           DASHBOARD GRID
+        ===================================== */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            align-items: stretch;
+        }
+
+
+        /* =====================================
+           DASHBOARD CARDS
+        ===================================== */
+
+        .dashboard-card {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            min-width: 0;
+            min-height: 270px;
+            padding: 28px;
+
+            background: linear-gradient(145deg, #ffffff, #fcfefc);
+            border: 1px solid var(--rd-border);
+            border-radius: 22px;
+
+            box-shadow:
+                0 3px 8px rgba(30, 57, 37, 0.025),
+                0 8px 22px rgba(30, 57, 37, 0.045);
+
+            overflow: hidden;
+
+            transition:
+                transform 0.28s ease,
+                box-shadow 0.28s ease,
+                border-color 0.28s ease;
+        }
+
+        .dashboard-card::before {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 4px;
+
+            background: linear-gradient(90deg, #236b3a, #83c994);
+
+            transform: scaleX(0);
+            transform-origin: left;
+
+            transition: transform 0.28s ease;
+        }
+
+
+        /* =====================================
+           CARD ICONS
+        ===================================== */
+
+        .dashboard-card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+
+            margin-bottom: 20px;
+
+            color: var(--rd-green);
+
+            background: linear-gradient(145deg, #edf8ef, #e1f1e5);
+            border: 1px solid #d8eadc;
+            border-radius: 17px;
+
+            transition:
+                transform 0.28s ease,
+                background-color 0.28s ease,
+                box-shadow 0.28s ease;
+        }
+
+        .dashboard-card-icon svg {
+            display: block;
+            width: 27px;
+            height: 27px;
+        }
+
+
+        /* =====================================
+           CARD CONTENT
+        ===================================== */
+
+        .dashboard-card h3 {
+            margin: 0 0 12px;
+
+            color: #24362a;
+            font-size: 21px;
+            line-height: 1.4;
+
+            transition: color 0.25s ease;
+        }
+
+        .dashboard-card>p {
+            flex-grow: 1;
+
+            margin: 0 0 24px;
+
+            color: var(--rd-muted);
+            font-size: 14px;
+            line-height: 1.85;
+        }
+
+
+        /* =====================================
+           BUTTONS
+        ===================================== */
+
+        .dashboard-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            min-height: 47px;
+            max-width: 100%;
+
+            padding: 12px 18px;
+
+            background: var(--rd-green);
+            color: #ffffff !important;
+
+            border: 1px solid var(--rd-green);
+            border-radius: 10px;
+
+            box-shadow: 0 3px 7px rgba(35, 107, 58, 0.10);
+
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+
+            text-align: center;
+            text-decoration: none;
+            overflow-wrap: anywhere;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .dashboard-button svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+
+            transition: transform 0.2s ease;
+        }
+
+        .dashboard-button:hover {
+            background: var(--rd-green-dark);
+            border-color: var(--rd-green-dark);
+            color: #ffffff !important;
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 7px 15px rgba(35, 107, 58, 0.18);
+        }
+
+        .dashboard-button:hover svg {
+            transform: translateX(3px);
+        }
+
+        .dashboard-button:focus-visible,
+        .logout-button:focus-visible {
+            outline: 3px solid #82b991;
+            outline-offset: 3px;
+        }
+
+
+        /* =====================================
+           AI AGENT CARD
+        ===================================== */
+
+        .ai-card {
+            background:
+                radial-gradient(ellipse at 100% 0%,
+                    rgba(180, 158, 246, 0.15),
+                    transparent 42%),
+                linear-gradient(135deg, #ffffff, #f8f5ff);
+
+            border-color: #e6ddfb;
+        }
+
+        .ai-card::before {
+            background: linear-gradient(90deg, #7450b5, #b9a0ef);
+        }
+
+        .ai-card h3 {
+            color: #6544a1;
+        }
+
+        .ai-card .dashboard-card-icon {
+            color: #7350b5;
+            background: #eee7ff;
+            border-color: #e2d6ff;
+        }
+
+        .ai-card .ai-button {
+            background: #7450b5;
+            border-color: #7450b5;
+            color: #ffffff !important;
+
+            box-shadow: 0 3px 7px rgba(116, 80, 181, 0.12);
+        }
+
+        .ai-card .ai-button:hover {
+            background: #5e3d98;
+            border-color: #5e3d98;
+            color: #ffffff !important;
+
+            box-shadow: 0 7px 15px rgba(116, 80, 181, 0.20);
+        }
+
+
+        /* =====================================
+           AI MESSAGE
+        ===================================== */
+
+        #aiMessage {
+            width: 100%;
+
+            margin: 16px 0 0;
+            padding: 13px 15px;
+
+            color: #6544a1;
+            background: #eee7ff;
+
+            border: 1px solid #e0d3ff;
+            border-radius: 10px;
+
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+
+        /* =====================================
+           CARD HOVER EFFECTS
+        ===================================== */
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .dashboard-card:hover {
+                transform: translateY(-6px);
+
+                border-color: #bcd9c3;
+
+                box-shadow:
+                    0 8px 18px rgba(30, 57, 37, 0.045),
+                    0 20px 38px rgba(35, 107, 58, 0.10);
+            }
+
+            .dashboard-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .dashboard-card:hover .dashboard-card-icon {
+                transform: translateY(-3px);
+                background: #e1f2e5;
+
+                box-shadow: 0 5px 12px rgba(35, 107, 58, 0.09);
+            }
+
+            .dashboard-card:hover h3 {
+                color: var(--rd-green);
+            }
+
+            .ai-card:hover {
+                border-color: #d2c1f2;
+
+                box-shadow:
+                    0 8px 18px rgba(70, 45, 110, 0.04),
+                    0 20px 38px rgba(116, 80, 181, 0.12);
+            }
+
+            .ai-card:hover .dashboard-card-icon {
+                background: #e8ddff;
+
+                box-shadow: 0 5px 12px rgba(116, 80, 181, 0.10);
+            }
+
+            .ai-card:hover h3 {
+                color: #6544a1;
+            }
+        }
+
+
+        /* =====================================
+           LOGOUT BUTTON
+        ===================================== */
+
+        .dashboard-footer {
+            display: flex;
+            justify-content: center;
+
+            margin-top: 32px;
+            padding-bottom: 10px;
+        }
+
+        .logout-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            min-width: 125px;
+            min-height: 45px;
+
+            padding: 12px 24px;
+
+            background: #d64545;
+            color: #ffffff !important;
+
+            border: 1px solid #d64545;
+            border-radius: 10px;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            text-decoration: none;
+
+            transition:
+                background-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .logout-button svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .logout-button:hover {
+            background: #b83232;
+            border-color: #b83232;
+            color: #ffffff !important;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 5px 12px rgba(214, 69, 69, 0.18);
+        }
+
+
+        /* =====================================
+           TABLET
+        ===================================== */
+
+        @media (max-width: 1000px) {
+
+            .dashboard-container {
+                padding: 25px;
+            }
+
+            .welcome-section {
+                padding: 30px;
+            }
+
+            .welcome-image {
+                width: 170px;
+                height: 140px;
+            }
+
+            .dashboard-card {
+                padding: 25px;
+            }
+        }
+
+
+        /* =====================================
+           SMALL SCREENS
+        ===================================== */
+
+        @media (max-width: 768px) {
+
+            .dashboard-container {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .welcome-section {
+                gap: 18px;
+                padding: 25px;
+            }
+
+            .welcome-section h1 {
+                font-size: 28px;
+            }
+
+            .welcome-section p {
+                font-size: 14px;
+            }
+
+            .welcome-image {
+                width: 125px;
+                height: 115px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-card {
+                min-height: 245px;
+            }
+        }
+
+
+        /* =====================================
+           VERY SMALL SCREENS
+        ===================================== */
+
+        @media (max-width: 500px) {
+
+            .dashboard-container {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .welcome-section {
+                padding: 23px;
+                border-radius: 19px;
+            }
+
+            .welcome-section h1 {
+                font-size: 26px;
+            }
+
+            .welcome-image-frame {
+                display: none;
+            }
+
+            .dashboard-section-heading h2 {
+                font-size: 21px;
+            }
+
+            .dashboard-card {
+                min-height: auto;
+                padding: 23px;
+            }
+
+            .dashboard-button {
+                width: 100%;
+            }
+        }
+
+
+        /* =====================================
+           ENTRANCE ANIMATION
+        ===================================== */
+
+        @keyframes rdFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* =====================================
+           REDUCED MOTION
+        ===================================== */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .dashboard-container *,
+            .dashboard-container *::before,
+            .dashboard-container *::after {
+                transition: none !important;
+                animation: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="dashboard-container">
+
+        <!-- WELCOME BANNER -->
+
+        <section class="welcome-section">
+
+            <div class="welcome-content">
+
+                <span class="welcome-label">
+                    RECEIVER DASHBOARD
+                </span>
+
+                <h1>
+                    Welcome, {{ session.get('name', 'Receiver') }}! 👋
+                </h1>
+
+                <p>
+                    Discover available surplus food, manage your requests,
+                    and connect with Food Providers through MealMatch.
+                    Find food that meets your needs while helping reduce food waste.
+                </p>
+
+            </div>
+
+            <div class="welcome-image-frame">
+
+                <img class="welcome-image"
+                    src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=85"
+                    alt="Freshly prepared food ready to be shared" loading="eager">
+
+            </div>
+
+        </section>
+
+
+        <!-- SECTION HEADING -->
+        <section class="dashboard-section-heading">
+
+            <h2>Find Your Next Meal 🍽️</h2>
+
+            <p>
+                Discover available food, track your requests, and connect with providers.
+            </p>
+
+        </section>
+
+        <!-- DASHBOARD CARDS -->
+
+        <section class="dashboard-grid">
+
+            <!-- BROWSE FOOD -->
+
+            <article class="dashboard-card">
+
+                <div class="dashboard-card-icon">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                        <path d="m16 16 4.5 4.5"></path>
+                    </svg>
+
+                </div>
+
+                <h3>Browse Food</h3>
+
+                <p>
+                    Explore available surplus food listings and find
+                    food that suits your requirements.
+                </p>
+
+                <a href="{{ url_for('browse_food') }}" class="dashboard-button">
+                    Browse Available Food
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"></path>
+                        <path d="m13 6 6 6-6 6"></path>
+                    </svg>
+
+                </a>
+
+            </article>
+
+
+            <!-- MY FOOD REQUESTS -->
+
+            <article class="dashboard-card">
+
+                <div class="dashboard-card-icon">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <rect x="5" y="4" width="14" height="17" rx="2"></rect>
+                        <path d="M9 4.5V3h6v1.5"></path>
+                        <path d="m8.5 12 2 2 5-5"></path>
+                        <path d="M9 17h6"></path>
+                    </svg>
+
+                </div>
+
+                <h3>My Food Requests</h3>
+
+                <p>
+                    Check your requests, track their status,
+                    and see which requests have been accepted.
+                </p>
+
+                <a href="{{ url_for('my_requests') }}" class="dashboard-button">
+                    View My Requests
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"></path>
+                        <path d="m13 6 6 6-6 6"></path>
+                    </svg>
+
+                </a>
+
+            </article>
+
+
+            <!-- CHAT WITH PROVIDERS -->
+
+            <article class="dashboard-card">
+
+                <div class="dashboard-card-icon">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path
+                            d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z">
+                        </path>
+                        <path d="M8 12h8"></path>
+                        <path d="M8 9h5"></path>
+                    </svg>
+
+                </div>
+
+                <h3>Chat with Providers</h3>
+
+                <p>
+                    Coordinate pickup times and discuss food
+                    collection with Food Providers.
+                </p>
+
+                <a href="{{ url_for('my_requests') }}" class="dashboard-button">
+                    Manage Conversations
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"></path>
+                        <path d="m13 6 6 6-6 6"></path>
+                    </svg>
+
+                </a>
+
+            </article>
+
+
+            <!-- MEALMATCH AI AGENT -->
+
+            <article class="dashboard-card ai-card">
+
+                <div class="dashboard-card-icon">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <rect x="5" y="7" width="14" height="13" rx="3"></rect>
+                        <path d="M12 3v4"></path>
+                        <path d="M9 12h.01"></path>
+                        <path d="M15 12h.01"></path>
+                        <path d="M9 16h6"></path>
+                        <path d="M2 12h3"></path>
+                        <path d="M19 12h3"></path>
+                    </svg>
+
+                </div>
+
+                <h3>MealMatch AI Agent</h3>
+
+                <p>
+                    Find food that matches your needs. The AI Agent
+                    can compare food types, required quantities,
+                    locations and availability to rank suitable options.
+                </p>
+
+                <button type="button" class="dashboard-button ai-button" onclick="showAIMessage()">
+                    Find Best Food Matches
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"></path>
+                        <path d="m13 6 6 6-6 6"></path>
+                    </svg>
+
+                </button>
+
+                <p id="aiMessage" style="display: none;" role="status" aria-live="polite"></p>
+
+            </article>
+
+        </section>
+
+
+        <!-- LOGOUT -->
+
+        <footer class="dashboard-footer">
+
+            <a href="{{ url_for('logout') }}" class="logout-button">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <path d="M10 17l5-5-5-5"></path>
+                    <path d="M15 12H3"></path>
+                    <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+                </svg>
+
+                Logout
+
+            </a>
+
+        </footer>
+
+    </main>
+
+
+    <script>
+        function showAIMessage() {
+            const message = document.getElementById("aiMessage");
+
+            message.textContent =
+                "Your AI matching feature is the next step! " +
+                "We'll connect it to your requirements and available food listings.";
+
+            message.style.display = "block";
+        }
+    </script>
+
+</body>
+
+</html>

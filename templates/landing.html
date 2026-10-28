@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MealMatch</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="landing-page">
+    <header class="landing-header">
+        <a class="landing-logo" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='mealmatch-logo-transparent.png') }}" alt="MealMatch">
+        </a>
+
+        <nav class="landing-nav" aria-label="Main navigation">
+            <a href="#how-it-works">How it works</a>
+            <a href="#landing-ai">MealMatch uniqueness</a>
+            <a href="#about">About</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a class="landing-signup" href="{{ url_for('register') }}">Sign up</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="landing-hero">
+            <div class="landing-hero-copy">
+                <p class="landing-eyebrow">FROM EXTRA MEALS TO MEANINGFUL MEALS</p>
+                <h1>Good food deserves a destination.</h1>
+                <p class="landing-intro">
+                    Connect surplus food with organisations that need it.
+                    Share more, waste less, and make a difference in your community.
+                </p>
+                <a class="landing-cta" href="{{ url_for('register') }}">
+                    Get Started <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="landing-hero-art">
+                <img class="landing-hero-photo" src="{{ url_for('static', filename='hero-food.png') }}"
+                    alt="A meal being shared between community members">
+
+                <div class="landing-photo-label">
+                    <span class="landing-label-icon" aria-hidden="true">💚</span>
+                    <span>
+                        <strong>Good food, shared</strong>
+                        <small>Making a difference together</small>
+                    </span>
+                </div>
+
+                <div class="landing-photo-sticker">
+                    Less waste<br>More care
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-ai" id="landing-ai" aria-labelledby="landing-ai-heading">
+            <div class="landing-ai-copy">
+                <p class="landing-ai-label">THE MEALMATCH DIFFERENCE</p>
+                <h2 id="landing-ai-heading">Meet your MealMatch AI assistant</h2>
+                <p>
+                    MealMatch AI is designed to help receivers find food that fits their needs.
+                    It compares available listings with each request, ranks suitable options,
+                    and explains why a match may work.
+                </p>
+
+                <ul class="landing-ai-points">
+                    <li>Compares food type, quantity, price, location, and availability</li>
+                    <li>Highlights the strongest matches and explains the fit</li>
+                    <li>Helps providers and receivers coordinate pickup details</li>
+                </ul>
+
+                <p class="landing-ai-note">
+                    AI-assisted matching and coordination are planned features; they are not
+                    currently active in this version of the app.
+                </p>
+            </div>
+
+            <div class="landing-ai-flow" aria-label="How MealMatch AI matching is intended to work">
+                <div class="landing-ai-flow-item">
+                    <span aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 13h-5a5 5 0 0 0-5 5v32a5 5 0 0 0 5 5h29a5 5 0 0 0 5-5V18a5 5 0 0 0-5-5h-5">
+                            </path>
+                            <rect x="23" y="8" width="18" height="12" rx="4"></rect>
+                            <path d="M22 31h20M22 39h20M22 47h12"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>Receiver shares a need</strong>
+                        <small>Meal type, quantity, budget, and location</small>
+                    </div>
+                </div>
+
+                <div class="landing-ai-connector" aria-hidden="true"></div>
+
+                <div class="landing-ai-flow-item">
+                    <span aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m32 8 5 16 16 5-16 5-5 16-5-16-16-5 16-5 5-16Z"></path>
+                            <path d="m50 39 2.5 7.5L60 49l-7.5 2.5L50 59l-2.5-7.5L40 49l7.5-2.5L50 39Z"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>AI compares listings</strong>
+                        <small>Availability, distance, food type, quantity, and price</small>
+                    </div>
+                </div>
+
+                <div class="landing-ai-connector" aria-hidden="true"></div>
+
+                <div class="landing-ai-best-match">
+                    <span class="landing-ai-match-icon" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="32" cy="32" r="23"></circle>
+                            <path d="m21 32 8 8 15-17"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <small>BEST-FIT OPTIONS</small>
+                        <strong>Ranked matches with reasons</strong>
+                        <p>Providers and receivers can coordinate the handover.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-how" id="how-it-works" aria-labelledby="how-heading">
+            <div class="landing-section-heading">
+                <p class="landing-eyebrow">FROM SIGNUP TO SHARED MEALS</p>
+                <h2 id="how-heading">How MealMatch works</h2>
+                <p>Providers share surplus food. Receivers find options. Together, they coordinate a handover.</p>
+            </div>
+
+            <ol class="landing-steps landing-steps-four">
+                <li>
+                    <span class="landing-step-number" aria-hidden="true">01</span>
+                    <span class="landing-step-icon" aria-hidden="true">
+                        <svg class="landing-step-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"
+                            stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="25" cy="18" r="8"></circle>
+                            <path d="M9 52c0-10 7-17 16-17s16 7 16 17"></path>
+                            <path d="M49 18v16M41 26h16"></path>
+                        </svg>
+                    </span>
+                    <h3>Create an account</h3>
+                    <p>
+                        Providers enter their organisation details and FSSAI licence number during signup.
+                        This version stores the number but does not yet verify it with the FSSAI registry.
+                    </p>
+                </li>
+
+                <li>
+                    <span class="landing-step-number" aria-hidden="true">02</span>
+                    <span class="landing-step-icon" aria-hidden="true">
+                        <svg class="landing-step-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"
+                            stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c-4 5 4 7 0 12"></path>
+                            <path d="M32 8c-4 5 4 7 0 12"></path>
+                            <path d="M43 10c-4 5 4 7 0 12"></path>
+                            <path d="M12 29h40"></path>
+                            <path d="m16 30 4 20a7 7 0 0 0 7 6h10a7 7 0 0 0 7-6l4-20"></path>
+                        </svg>
+                    </span>
+                    <h3>Share available food</h3>
+                    <p>
+                        Providers post the food, quantity, price, location, and pickup availability
+                        so receivers can see what is offered.
+                    </p>
+                </li>
+
+                <li>
+                    <span class="landing-step-number" aria-hidden="true">03</span>
+                    <span class="landing-step-icon" aria-hidden="true">
+                        <svg class="landing-step-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"
+                            stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="27" cy="27" r="16"></circle>
+                            <path d="m39 39 14 14"></path>
+                            <path d="m20 27 5 5 10-11"></path>
+                        </svg>
+                    </span>
+                    <h3>Find the best fit</h3>
+                    <p>
+                        MealMatch AI is intended to compare listings with receiver needs, rank suitable
+                        options, and explain why they match.
+                    </p>
+                </li>
+
+                <li>
+                    <span class="landing-step-number" aria-hidden="true">04</span>
+                    <span class="landing-step-icon" aria-hidden="true">
+                        <svg class="landing-step-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"
+                            stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 12h33a6 6 0 0 1 6 6v24a6 6 0 0 1-6 6H29L15 59V18a6 6 0 0 1 6-6"></path>
+                            <path d="m25 30 7 7 14-15"></path>
+                        </svg>
+                    </span>
+                    <h3>Coordinate and confirm</h3>
+                    <p>
+                        The provider and receiver can arrange pickup, communicate about the request,
+                        and confirm when the food handover is complete.
+                    </p>
+                </li>
+            </ol>
+
+            <a class="landing-how-cta" href="{{ url_for('register') }}">
+                Join MealMatch <span aria-hidden="true">→</span>
+            </a>
+        </section>
+
+        <section class="landing-features" id="about" aria-label="Why MealMatch matters">
+            <article>
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M32 52V32"></path>
+                        <path d="M32 37C17 37 12 27 13 14c13-1 24 4 24 17"></path>
+                        <path d="M32 32c0-13 8-21 21-22 1 13-5 22-19 24"></path>
+                        <path d="M23 24l9 8M43 20l-9 11"></path>
+                        <path d="M21 53h22"></path>
+                    </svg>
+                </span>
+                <h2>Zero Food Waste</h2>
+                <p>Help good food reach people instead of going to waste.</p>
+            </article>
+
+            <article>
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M32 51S11 39 11 24c0-7 5-12 12-12 5 0 8 3 9 7 2-4 5-7 10-7 7 0 12 5 12 12 0 15-22 27-22 27Z">
+                        </path>
+                    </svg>
+                </span>
+                <h2>Meals For All</h2>
+                <p>Connect community organisations with available meals.</p>
+            </article>
+
+            <article>
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="m10 25 13-11 11 5 7-3 13 10"></path>
+                        <path d="m10 25 13 20c2 3 5 4 8 2l3-2"></path>
+                        <path d="m20 18 14 16c2 2 5 2 7 0l2-2"></path>
+                        <path d="m41 17 13 10-8 17c-1 3-5 4-8 2l-7-6"></path>
+                        <path d="m27 39 5 6M34 35l6 6M41 31l6 5"></path>
+                    </svg>
+                </span>
+                <h2>Partner With Us</h2>
+                <p>Bring food providers and organisations together.</p>
+            </article>
+
+            <article>
+                <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="m32 9 4.5 14.5L51 28l-14.5 4.5L32 47l-4.5-14.5L13 28l14.5-4.5L32 9Z"></path>
+                        <path d="m50 39 2.5 7.5L60 49l-7.5 2.5L50 59l-2.5-7.5L40 49l7.5-2.5L50 39Z"></path>
+                        <path d="m15 6 1.5 4.5L21 12l-4.5 1.5L15 18l-1.5-4.5L9 12l4.5-1.5L15 6Z"></path>
+                    </svg>
+                </span>
+                <h2>A Better Tomorrow</h2>
+                <p>Small acts of sharing can create a stronger community.</p>
+            </article>
+        </section>
+    </main>
+
+    <footer class="landing-footer">
+        <p>Made with 💚 to help good food find a good home.</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.landing-nav a[href^="#"]').forEach(link => {
+            link.addEventListener('click', () => {
+                const section = document.querySelector(link.getAttribute('href'));
+                if (!section) return;
+
+                section.classList.remove('nav-fade-in');
+                void section.offsetWidth;
+                section.classList.add('nav-fade-in');
+            });
+        });
+    </script>
+</body>
+
+</html>

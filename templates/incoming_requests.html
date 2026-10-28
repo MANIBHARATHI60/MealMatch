@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Incoming Requests | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* ==========================================
+           MEALMATCH — PREMIUM INCOMING REQUESTS
+        ========================================== */
+
+        .requests-with-sidebar {
+            --request-green: #236b3a;
+            --request-dark: #174b2b;
+            --request-text: #26372b;
+            --request-muted: #748078;
+
+            position: relative;
+            isolation: isolate;
+
+            width: calc(100% - 250px);
+            max-width: none;
+            min-height: 100vh;
+
+            margin: 0 0 0 250px;
+            padding: 35px;
+
+            box-sizing: border-box;
+
+            background:
+                radial-gradient(ellipse at 5% 5%,
+                    rgba(111, 183, 127, 0.13),
+                    transparent 32%),
+                radial-gradient(ellipse at 95% 50%,
+                    rgba(111, 183, 127, 0.09),
+                    transparent 35%),
+                #f4f8f4;
+
+            color: var(--request-text);
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .requests-with-sidebar *,
+        .requests-with-sidebar *::before,
+        .requests-with-sidebar *::after {
+            box-sizing: border-box;
+        }
+
+        /* PAGE HEADER */
+
+        .requests-with-sidebar .requests-page-header {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+
+            padding: 38px 40px;
+            margin-bottom: 30px;
+
+            background:
+                radial-gradient(circle at 100% 0%,
+                    rgba(126, 211, 145, 0.22),
+                    transparent 38%),
+                linear-gradient(120deg,
+                    #174f2b 0%,
+                    #236b3a 52%,
+                    #398751 100%);
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 25px;
+
+            box-shadow:
+                0 8px 22px rgba(23, 79, 43, 0.12),
+                0 20px 42px rgba(23, 79, 43, 0.10);
+
+            animation: request-page-enter 0.6s ease both;
+
+            transition:
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+        /* DECORATIVE CIRCLES */
+
+        .requests-with-sidebar .requests-page-header::before {
+            content: "";
+            position: absolute;
+
+            width: 280px;
+            height: 280px;
+
+            top: -165px;
+            right: -65px;
+
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 0 24px rgba(255, 255, 255, 0.025),
+                0 0 0 48px rgba(255, 255, 255, 0.02);
+
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .requests-with-sidebar .requests-page-header::after {
+            content: "";
+            position: absolute;
+
+            width: 190px;
+            height: 190px;
+
+            right: 115px;
+            bottom: -145px;
+
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 50%;
+
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* BANNER HOVER */
+
+        @media (hover: hover) and (pointer: fine) {
+            .requests-with-sidebar .requests-page-header:hover {
+                box-shadow:
+                    0 12px 28px rgba(23, 79, 43, 0.16),
+                    0 25px 48px rgba(23, 79, 43, 0.13);
+
+                border-color: rgba(255, 255, 255, 0.22);
+            }
+        }
+
+        /* ENTRANCE ANIMATION */
+
+        @keyframes request-page-enter {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* BANNER HEADING */
+
+        .requests-with-sidebar .requests-page-header h1 {
+            position: relative;
+            z-index: 1;
+
+            margin: 18px 0 12px;
+
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: 750;
+            line-height: 1.25;
+            letter-spacing: -0.7px;
+        }
+
+        /* BANNER DESCRIPTION */
+
+        .requests-with-sidebar .requests-page-header p {
+            position: relative;
+            z-index: 1;
+
+            max-width: 760px;
+
+            margin: 0;
+
+            color: #e0f0e3;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        /* EYEBROW LABEL */
+
+        .requests-with-sidebar .requests-header-label {
+            position: relative;
+            z-index: 1;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 9px 15px;
+
+            color: #e5f5e8;
+            background: rgba(255, 255, 255, 0.10);
+
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 30px;
+
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* ANIMATED STATUS DOT */
+
+        .requests-with-sidebar .requests-header-label::before {
+            content: "";
+
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+
+            background: #a8e6b5;
+            border-radius: 50%;
+
+            box-shadow: 0 0 0 4px rgba(168, 230, 181, 0.12);
+
+            animation: request-dot-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes request-dot-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 4px rgba(168, 230, 181, 0.12);
+            }
+
+            50% {
+                box-shadow: 0 0 0 7px rgba(168, 230, 181, 0.04);
+            }
+        }
+
+        /* REDUCED MOTION */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .requests-with-sidebar .requests-page-header,
+            .requests-with-sidebar .requests-header-label::before {
+                animation: none;
+                transition: none;
+            }
+        }
+
+        /* RESPONSIVE BANNER */
+
+        @media (max-width: 768px) {
+            .requests-with-sidebar .requests-page-header {
+                padding: 28px 25px;
+                border-radius: 20px;
+            }
+
+            .requests-with-sidebar .requests-page-header h1 {
+                font-size: 28px;
+            }
+
+            .requests-with-sidebar .requests-page-header p {
+                font-size: 15px;
+                line-height: 1.7;
+            }
+
+            .requests-with-sidebar .requests-header-label {
+                font-size: 10px;
+                letter-spacing: 1px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .requests-with-sidebar .requests-page-header {
+                padding: 24px 20px;
+                margin-bottom: 22px;
+                border-radius: 17px;
+            }
+
+            .requests-with-sidebar .requests-page-header h1 {
+                font-size: 24px;
+                line-height: 1.35;
+            }
+
+            .requests-with-sidebar .requests-page-header p {
+                font-size: 14px;
+            }
+        }
+
+        /* REQUEST CARD */
+
+        .requests-with-sidebar .request-card {
+            position: relative;
+
+            display: flex;
+            align-items: stretch;
+            gap: 25px;
+
+            min-width: 0;
+            padding: 23px;
+            margin-bottom: 23px;
+
+            background: #ffffff;
+
+            border: 1px solid #e1eae2;
+            border-radius: 20px;
+
+            box-shadow:
+                0 3px 8px rgba(30, 60, 37, 0.025),
+                0 9px 25px rgba(30, 60, 37, 0.045);
+
+            transition:
+                transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+
+            animation: request-page-enter 0.55s ease both;
+        }
+
+        .requests-with-sidebar .request-card:hover {
+            transform: translateY(-6px);
+
+            border-color: #b9d9c1;
+
+            box-shadow:
+                0 8px 18px rgba(35, 107, 58, 0.045),
+                0 20px 40px rgba(35, 107, 58, 0.09);
+        }
+
+        .requests-with-sidebar .request-card:nth-of-type(2) {
+            animation-delay: 0.08s;
+        }
+
+        .requests-with-sidebar .request-card:nth-of-type(3) {
+            animation-delay: 0.16s;
+        }
+
+        /* FOOD IMAGE */
+
+        .requests-with-sidebar .food-image-container {
+            position: relative;
+
+            flex: 0 0 230px;
+            width: 230px;
+            min-width: 0;
+            min-height: 210px;
+
+            overflow: hidden;
+
+            background: linear-gradient(135deg,
+                    #edf6ee,
+                    #dfede1);
+
+            border-radius: 15px;
+        }
+
+        .requests-with-sidebar .food-image-container::after {
+            content: "";
+
+            position: absolute;
+            inset: 0;
+
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: inherit;
+
+            pointer-events: none;
+        }
+
+        .requests-with-sidebar .food-image-container img,
+        .requests-with-sidebar .food-image {
+            display: block;
+
+            width: 100%;
+            height: 100%;
+            min-height: 210px;
+
+            object-fit: cover;
+
+            transition:
+                transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1),
+                filter 0.4s ease;
+        }
+
+        .requests-with-sidebar .request-card:hover .food-image-container img,
+        .requests-with-sidebar .request-card:hover .food-image {
+            transform: scale(1.07);
+            filter: saturate(1.08);
+        }
+
+        .requests-with-sidebar .no-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+
+            width: 100%;
+            height: 100%;
+            min-height: 210px;
+
+            padding: 20px;
+
+            color: #66816d;
+
+            background:
+                radial-gradient(circle at 50% 30%,
+                    rgba(115, 187, 130, 0.18),
+                    transparent 65%),
+                #edf6ee;
+
+            text-align: center;
+
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .requests-with-sidebar .no-image span {
+            font-size: 46px;
+
+            transition: transform 0.3s ease;
+        }
+
+        .requests-with-sidebar .request-card:hover .no-image span {
+            transform: translateY(-4px) scale(1.06);
+        }
+
+        /* REQUEST DETAILS */
+
+        .requests-with-sidebar .request-details {
+            flex: 1;
+            min-width: 0;
+            padding: 3px 0;
+        }
+
+        .requests-with-sidebar .request-details h2,
+        .requests-with-sidebar .request-details h3 {
+            margin: 0 0 19px;
+
+            color: #245b35;
+
+            font-size: 23px;
+            font-weight: 800;
+            line-height: 1.4;
+            letter-spacing: -0.4px;
+
+            overflow-wrap: anywhere;
+
+            transition: color 0.25s ease;
+        }
+
+        .requests-with-sidebar .request-card:hover .request-details h2,
+        .requests-with-sidebar .request-card:hover .request-details h3 {
+            color: #236b3a;
+        }
+
+        .requests-with-sidebar .request-details p {
+            margin: 0 0 12px;
+
+            color: #657168;
+
+            font-size: 13px;
+            line-height: 1.8;
+
+            overflow-wrap: anywhere;
+        }
+
+        .requests-with-sidebar .request-details p strong {
+            color: #344b39;
+            font-weight: 750;
+        }
+
+        /* STATUS BADGES */
+
+        .requests-with-sidebar .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            max-width: 100%;
+            padding: 7px 12px;
+
+            color: #946200;
+            background: #fff5df;
+
+            border: 1px solid #f1e2b9;
+            border-radius: 30px;
+
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.5;
+
+            overflow-wrap: anywhere;
+
+            transition:
+                background-color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .requests-with-sidebar .status::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+            flex-shrink: 0;
+
+            background: #d6a02d;
+            border-radius: 50%;
+        }
+
+        .requests-with-sidebar .request-card:hover .status {
+            transform: translateY(-1px);
+        }
+
+        /* ACCEPTED / COMPLETED MESSAGE */
+
+        .requests-with-sidebar .accepted-message {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            max-width: 100%;
+            padding: 12px 15px;
+            margin: 12px 0 0;
+
+            color: #236b3a;
+            background: linear-gradient(135deg,
+                    #edf8ef,
+                    #e3f3e6);
+
+            border: 1px solid #cce5d0;
+            border-radius: 12px;
+
+            font-size: 13px;
+            font-weight: 750;
+            line-height: 1.7;
+
+            overflow-wrap: anywhere;
+        }
+
+        /* ACTION BUTTONS */
+
+        .requests-with-sidebar .action-button,
+        .requests-with-sidebar .confirm-handover-button,
+        .requests-with-sidebar .reject-proposal-button {
+            position: relative;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            min-height: 45px;
+            padding: 12px 19px;
+            margin-top: 14px;
+
+            border: 1px solid transparent;
+            border-radius: 11px;
+
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 750;
+            line-height: 1.5;
+            text-align: center;
+            text-decoration: none;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.22s ease,
+                box-shadow 0.22s ease,
+                background-color 0.22s ease,
+                border-color 0.22s ease;
+        }
+
+        .requests-with-sidebar .action-button {
+            color: #ffffff;
+            background: linear-gradient(115deg,
+                    #236b3a,
+                    #32854b);
+
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.13);
+        }
+
+        .requests-with-sidebar .action-button:hover {
+            color: #ffffff;
+            background: linear-gradient(115deg,
+                    #1b582f,
+                    #287740);
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 9px 20px rgba(35, 107, 58, 0.20);
+        }
+
+        .requests-with-sidebar .action-button:active,
+        .requests-with-sidebar .confirm-handover-button:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        .requests-with-sidebar .action-button:focus-visible,
+        .requests-with-sidebar .confirm-handover-button:focus-visible {
+            outline: 3px solid #9ac9a4;
+            outline-offset: 3px;
+        }
+
+        /* REJECT PROPOSAL BUTTON */
+
+        .requests-with-sidebar .reject-proposal-button {
+            color: #ffffff;
+            background: linear-gradient(115deg, #c62828, #e24b4b);
+            border-color: #b83c3c;
+
+            isolation: isolate;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(183, 28, 28, 0.16);
+        }
+
+        .requests-with-sidebar .reject-proposal-button::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: -50%;
+            left: -80%;
+            width: 45%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.24);
+            transform: rotate(25deg);
+            transition: left 0.55s ease;
+            pointer-events: none;
+        }
+
+        .requests-with-sidebar .reject-proposal-button:hover {
+            color: #ffffff;
+            background: linear-gradient(115deg, #9f1d1d, #c62828);
+            border-color: #982d2d;
+            transform: translateY(-3px);
+            box-shadow: 0 9px 18px rgba(183, 28, 28, 0.24);
+        }
+
+        .requests-with-sidebar .reject-proposal-button:hover::before {
+            left: 140%;
+        }
+
+        .requests-with-sidebar .reject-proposal-button:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        /* QUANTITY NEGOTIATION */
+
+        .requests-with-sidebar .quantity-proposal-box {
+            margin-top: 16px;
+            padding: 20px;
+
+            background: #f5faf5;
+            border: 1px solid #d7e8da;
+            border-radius: 15px;
+        }
+
+        .requests-with-sidebar .quantity-proposal-box h3 {
+            margin-bottom: 14px;
+            font-size: 19px;
+        }
+
+        .requests-with-sidebar .proposal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .requests-with-sidebar .proposal-actions form {
+            min-width: 0;
+        }
+
+        /* HANDOVER CONTROL */
+
+        .requests-with-sidebar .handover-control {
+            margin-top: 5px;
+        }
+
+        .requests-with-sidebar .confirm-handover-button {
+            color: #ffffff;
+            background: #236b3a;
+            border-color: #236b3a;
+        }
+
+        .requests-with-sidebar .confirm-handover-button:hover {
+            color: #ffffff;
+            background: #174b2b;
+            border-color: #174b2b;
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 6px 14px rgba(35, 107, 58, 0.15);
+        }
+
+        /* EMPTY REQUESTS */
+
+        .requests-with-sidebar .empty-requests {
+            padding: 55px 25px;
+
+            background:
+                radial-gradient(ellipse at 50% 0%,
+                    rgba(120, 192, 135, 0.13),
+                    transparent 65%),
+                #ffffff;
+
+            border: 1px dashed #b9d9c4;
+            border-radius: 22px;
+
+            text-align: center;
+
+            box-shadow: 0 8px 25px rgba(30, 70, 39, 0.04);
+
+            animation: request-page-enter 0.6s ease both;
+
+            transition:
+                border-color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .requests-with-sidebar .empty-requests:hover {
+            border-color: #8fc69b;
+
+            box-shadow: 0 14px 30px rgba(35, 107, 58, 0.07);
+
+            transform: translateY(-3px);
+        }
+
+        .requests-with-sidebar .empty-requests h2 {
+            margin: 0 0 12px;
+
+            color: #245b35;
+
+            font-size: 25px;
+            line-height: 1.4;
+        }
+
+        .requests-with-sidebar .empty-requests p {
+            margin: 0;
+
+            color: #748078;
+
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        /* BACK TO DASHBOARD */
+
+        .requests-with-sidebar .back-dashboard-container {
+            display: block;
+            width: 100%;
+
+            margin: 28px 0 30px;
+
+            clear: both;
+        }
+
+        .requests-with-sidebar .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            min-height: 45px;
+            padding: 12px 20px;
+
+            color: #415247;
+            background: #ffffff;
+
+            border: 1px solid #dce7de;
+            border-radius: 11px;
+
+            font-size: 13px;
+            font-weight: 750;
+            text-decoration: none;
+
+            transition:
+                transform 0.22s ease,
+                box-shadow 0.22s ease,
+                background-color 0.22s ease,
+                border-color 0.22s ease;
+        }
+
+        .requests-with-sidebar .back-button:hover {
+            color: #236b3a;
+            background: #f6fbf6;
+            border-color: #b9d7bf;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 6px 15px rgba(30, 70, 39, 0.07);
+        }
+
+        /* SELECTED REQUEST HIGHLIGHT */
+
+        .requests-with-sidebar .request-card.request-highlight {
+            border-color: #4b9b60;
+
+            box-shadow:
+                0 0 0 4px rgba(72, 169, 104, 0.12),
+                0 15px 35px rgba(35, 107, 58, 0.12);
+        }
+
+        /* TABLET */
+
+        @media (max-width: 1100px) {
+            .requests-with-sidebar {
+                padding: 27px;
+            }
+
+            .requests-with-sidebar .request-card {
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .requests-with-sidebar .food-image-container {
+                flex-basis: 190px;
+                width: 190px;
+            }
+        }
+
+        /* SMALL SCREENS */
+
+        @media (max-width: 800px) {
+            .requests-with-sidebar {
+                width: calc(100% - 210px);
+                margin-left: 210px;
+                padding: 20px;
+            }
+
+            .requests-with-sidebar .request-card {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .requests-with-sidebar .food-image-container {
+                width: 100%;
+                height: 220px;
+                min-height: 0;
+                flex-basis: auto;
+            }
+
+            .requests-with-sidebar .food-image-container img,
+            .requests-with-sidebar .food-image {
+                height: 220px;
+                min-height: 0;
+            }
+
+            .requests-with-sidebar .no-image {
+                height: 220px;
+                min-height: 0;
+            }
+
+            .requests-with-sidebar .action-button,
+            .requests-with-sidebar .confirm-handover-button {
+                max-width: 100%;
+            }
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 500px) {
+            .requests-with-sidebar {
+                width: 100%;
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .requests-with-sidebar .requests-page-header {
+                padding: 27px 22px;
+                border-radius: 19px;
+            }
+
+            .requests-with-sidebar .requests-page-header h1 {
+                font-size: 27px;
+            }
+
+            .requests-with-sidebar .requests-page-header p {
+                font-size: 13px;
+            }
+
+            .requests-with-sidebar .request-card {
+                padding: 15px;
+                margin-bottom: 18px;
+                border-radius: 17px;
+            }
+
+            .requests-with-sidebar .request-details h2,
+            .requests-with-sidebar .request-details h3 {
+                font-size: 21px;
+            }
+
+            .requests-with-sidebar .action-button,
+            .requests-with-sidebar .confirm-handover-button {
+                width: 100%;
+            }
+
+            .requests-with-sidebar .proposal-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .requests-with-sidebar .proposal-actions form,
+            .requests-with-sidebar .proposal-actions button {
+                width: 100%;
+            }
+
+            .requests-with-sidebar .back-button {
+                width: 100%;
+            }
+        }
+
+        /* REDUCED MOTION ACCESSIBILITY */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .requests-with-sidebar *,
+            .requests-with-sidebar *::before,
+            .requests-with-sidebar *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        .handover-instruction {
+            margin: 10px 0 0;
+            padding: 10px 12px;
+
+            background: #FFF8E7;
+            border: 1px solid #F0DDA8;
+            border-radius: 8px;
+
+            color: #725B22;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* =========================================
+   HANDOVER BUTTON CONTAINER
+========================================= */
+
+        .handover-control {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+
+            width: 100%;
+            margin-top: 14px;
+        }
+
+
+        /* =========================================
+   MARK HANDOVER COMPLETED BUTTON
+========================================= */
+
+        .confirm-handover-button {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+
+            padding: 12px 16px;
+
+            background: #236B3A;
+            color: #FFFFFF;
+
+            border: 1px solid #236B3A;
+            border-radius: 9px;
+
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.5;
+            text-align: center;
+
+            cursor: pointer;
+
+            box-shadow: 0 3px 8px rgba(35, 107, 58, 0.12);
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .confirm-handover-button:hover {
+            background: #194F2B;
+            border-color: #194F2B;
+            color: #FFFFFF;
+
+            box-shadow: 0 5px 12px rgba(35, 107, 58, 0.20);
+            transform: translateY(-2px);
+        }
+
+        .confirm-handover-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(35, 107, 58, 0.12);
+        }
+
+        .confirm-handover-button:focus-visible {
+            outline: 2px solid #236B3A;
+            outline-offset: 3px;
+        }
+
+
+        /* =========================================
+   HANDOVER INSTRUCTION MESSAGE
+========================================= */
+
+        .handover-instruction {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+
+            margin: 0;
+            padding: 12px 14px;
+
+            background: #F3F7F0;
+            border: 1px solid #DCE8D8;
+            border-left: 4px solid #236B3A;
+            border-radius: 8px;
+
+            color: #465749;
+
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.7;
+
+            overflow-wrap: anywhere;
+        }
+
+
+        /* =========================================
+   HANDOVER COMPLETED MESSAGE
+========================================= */
+
+        .handover-control .accepted-message {
+            margin: 0;
+            padding: 11px 13px;
+
+            background: #E8F5ED;
+            border: 1px solid #CDE5D2;
+            border-radius: 8px;
+
+            color: #236B3A;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+
+        /* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+        @media (max-width: 500px) {
+            .handover-control {
+                margin-top: 12px;
+                gap: 8px;
+            }
+
+            .confirm-handover-button {
+                padding: 11px 12px;
+                font-size: 13px;
+            }
+
+            .handover-instruction {
+                padding: 10px 11px;
+                font-size: 12px;
+            }
+        }
+
+
+        /* =========================================
+   REDUCED MOTION ACCESSIBILITY
+========================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+            .confirm-handover-button {
+                transition: none;
+            }
+
+            .confirm-handover-button:hover,
+            .confirm-handover-button:active {
+                transform: none;
+            }
+        }
+
+        /* Inline handover confirmation panel */
+
+        .handover-confirmation {
+            margin-top: 12px;
+            padding: 15px;
+            background: #F3F7F0;
+            border: 1px solid #DCE8D8;
+            border-radius: 10px;
+        }
+
+        .handover-confirmation[hidden],
+        .confirm-handover-button[hidden] {
+            display: none !important;
+        }
+
+        .handover-confirmation p {
+            margin: 0 0 12px;
+            color: #35483A;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .handover-confirmation-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .handover-yes-button,
+        .handover-cancel-button {
+            min-height: 42px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .handover-yes-button {
+            background: #236B3A;
+            color: #FFFFFF;
+            border: 1px solid #236B3A;
+        }
+
+        .handover-yes-button:hover {
+            background: #194F2B;
+            transform: translateY(-2px);
+        }
+
+        .handover-cancel-button {
+            background: #FFFFFF;
+            color: #465749;
+            border: 1px solid #C9D5C8;
+        }
+
+        .handover-cancel-button:hover {
+            background: #E8F2E5;
+            transform: translateY(-2px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .handover-yes-button,
+            .handover-cancel-button {
+                transition: none;
+            }
+
+            .handover-yes-button:hover,
+            .handover-cancel-button:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <div class="container requests-with-sidebar">
+
+        <!-- PAGE HEADER -->
+
+        <header class="requests-page-header">
+
+            <span class="requests-header-label">
+                PROVIDER REQUEST MANAGEMENT
+            </span>
+
+            <h1>Incoming Food Requests 💚</h1>
+
+            <p>
+                Review requests from NGOs and organisations, coordinate
+                food pickups, and track every handover through MealMatch.
+            </p>
+
+        </header>
+
+        {% if requests_list %}
+
+        {% for item in requests_list %}
+
+        <div class="request-card" id="request-{{ item.request_id }}">
+
+            <!-- FOOD IMAGE -->
+
+            <div class="food-image-container">
+
+                {% if item.image_filename %}
+
+                <img class="food-image" src="{{ url_for('static', filename='uploads/' ~ item.image_filename) }}"
+                    alt="{{ item.food_name }}" loading="lazy">
+
+                {% else %}
+
+                <div class="no-image">
+                    <span>🍱</span>
+                    <div>No image available</div>
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- REQUEST DETAILS -->
+
+            <div class="request-details">
+
+                <h2>{{ item.food_name }}</h2>
+
+                <p>
+                    <strong>NGO Name:</strong>
+                    {{ item.ngo_name }}
+                </p>
+
+                <p>
+                    <strong>NGO Email:</strong>
+                    {{ item.ngo_email }}
+                </p>
+
+                <p>
+                    <strong>Food Quantity:</strong>
+                    {{ item.quantity }} meals
+                </p>
+
+                <p>
+                    <strong>Pickup Location:</strong>
+                    {{ item.location }}
+                </p>
+
+                <p>
+                    <strong>Request Date:</strong>
+                    {{ item.created_at }}
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+
+                    <span class="status">
+                        {{ item.request_status }}
+                    </span>
+                </p>
+
+                <!--
+                            COMPLETED REQUEST
+                            Check this before displaying other actions.
+                        -->
+
+                {% if item.request_status == 'completed' %}
+
+                {% if item.receiver_confirmed %}
+
+                <p class="accepted-message">
+                    Food receipt confirmed! ✓
+                </p>
+
+                {% else %}
+                <p class="accepted-message">
+                    Handover marked as completed ✓
+                </p>
+                <p>
+                    Waiting for the receiver to confirm food receipt.
+                </p>
+                {% endif %}
+                {% endif %}
+
+                {% if item.request_status|lower == 'cancelled' %}
+
+                <p class="accepted-message">
+                    ❌ Request Cancelled
+                </p>
+
+                {% if item.cancellation_reason == 'provider_timeout' %}
+                <p class="handover-message">
+                    The request was cancelled because the provider did not respond before the deadline.
+                </p>
+
+                {% elif item.cancellation_reason == 'receiver_timeout' %}
+                <p class="handover-message">
+                    The request was cancelled because the receiver did not confirm the arrangement before the deadline.
+                </p>
+
+                {% else %}
+                <p class="handover-message">
+                    This request was cancelled and is no longer active.
+                </p>
+                {% endif %}
+
+                {% elif item.quantity_proposal_status == 'pending' %}
+
+
+
+                <!-- QUANTITY NEGOTIATION -->
+
+
+
+                <div class="quantity-proposal-box">
+
+                    <h3>🤖 AI Quantity Negotiation</h3>
+
+                    <p>
+                        <strong>Receiver's proposed quantity:</strong>
+                        {{ item.proposed_quantity }}
+                    </p>
+
+                    <p>
+                        The receiver would like to negotiate the quantity
+                        for this food listing. Would you like to accept
+                        or reject the proposal?
+                    </p>
+
+                    <div class="proposal-actions">
+
+                        <form action="{{ url_for('accept_quantity_proposal', request_id=item.request_id) }}"
+                            method="POST">
+                            <button type="submit" class="action-button glossy-green-button">
+                                Accept Proposal ✓
+                            </button>
+                        </form>
+
+                        <form action="{{ url_for('reject_quantity_proposal', request_id=item.request_id) }}"
+                            method="POST">
+                            <button type="submit" class="reject-proposal-button">
+                                Reject Proposal ✕
+                            </button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% elif item.quantity_proposal_status == 'accepted'
+                and not item.arrangement_confirmed %}
+
+                <p class="accepted-message">
+                    Proposal accepted! ✓
+                </p>
+
+                <p>
+                    Waiting for the receiver to confirm the arrangement.
+                </p>
+
+                {% elif item.quantity_proposal_status == 'rejected' %}
+
+                <p class="accepted-message">
+                    Quantity proposal rejected.
+                </p>
+
+                <!-- NORMAL FOOD REQUEST -->
+
+                {% elif item.request_status == 'pending' %}
+
+                <form action="{{ url_for('accept_request', request_id=item.request_id) }}" method="POST">
+                    <button type="submit" class="action-button glossy-green-button">
+                        Accept Request
+                    </button>
+                </form>
+
+                <!-- ACCEPTED OR CONFIRMED REQUEST -->
+
+                {% elif item.request_status in ('accepted', 'confirmed') %}
+
+                <p class="accepted-message">
+
+                    {% if item.request_status == 'confirmed' %}
+                    Arrangement confirmed! ✓
+                    {% else %}
+                    Request accepted! ✅
+                    {% endif %}
+
+                </p>
+
+                <!-- OPEN CHAT -->
+
+                <a href="{{ url_for('open_chat', request_id=item.request_id) }}"
+                    class="action-button glossy-green-button">
+                    Open Chat 💬
+                </a>
+
+                <!-- HANDOVER STATUS AND CONTROLS -->
+
+                {% if item.receiver_confirmed %}
+
+                <p class="accepted-message">
+                    Exchange completed successfully ✓
+                </p>
+
+                <p class="handover-instruction">
+                    The receiver has confirmed food receipt. This exchange is complete.
+                </p>
+
+                <a href="{{ url_for('meal_match_feedback', request_id=item.request_id) }}"
+                    class="service-feedback-button">
+                    Give Feedback About MealMatch ⭐
+                </a>
+                {% elif item.handover_completed %}
+
+                <p class="accepted-message">
+                    Handover marked as completed ✓
+                </p>
+
+                <p class="handover-instruction">
+                    Waiting for the receiver to confirm food receipt.
+                </p>
+
+                {% else %}
+
+                <div class="handover-control">
+
+                    <button type="button" class="confirm-handover-button glossy-green-button"
+                        onclick="document.getElementById('handover-confirm-{{ item.request_id }}').hidden = false; this.hidden = true;">
+
+                        Mark Handover Completed ✓
+
+                    </button>
+
+                    <p class="handover-instruction">
+                        Have you physically handed over the food to the receiver?
+                        Click this button only after handing over the food.
+                    </p>
+
+                    <div id="handover-confirm-{{ item.request_id }}" class="handover-confirmation" hidden>
+
+                        <p>
+                            <strong>Have you handed over the food?</strong>
+                        </p>
+
+                        <div class="handover-confirmation-actions">
+
+                            <form action="{{ url_for('complete_handover', request_id=item.request_id) }}" method="POST">
+
+                                <button type="submit" class="handover-yes-button glossy-green-button">
+
+                                    OK, Confirm
+
+                                </button>
+
+                            </form>
+
+                            <button type="button" class="handover-cancel-button glossy-green-button"
+                                onclick="document.getElementById('handover-confirm-{{ item.request_id }}').hidden = true; this.closest('.handover-control').querySelector('.confirm-handover-button').hidden = false;">
+
+                                Cancel
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        {% else %}
+
+        <!-- EMPTY REQUESTS -->
+
+        <div class="empty-requests">
+
+            <h2>No requests yet</h2>
+
+            <p>
+                Receiver food requests will appear here when they are submitted.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+        <!-- BACK TO DASHBOARD -->
+
+        <div class="back-dashboard-container">
+
+            <a href="{{ url_for('dashboard') }}" class="back-button">
+                ← Back to Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- SELECTED REQUEST HIGHLIGHT -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const selectedRequestId =
+                "{{ selected_request_id if selected_request_id is not none else '' }}";
+
+            if (selectedRequestId !== "") {
+
+                const requestCard = document.getElementById(
+                    "request-" + selectedRequestId
+                );
+
+                if (requestCard) {
+
+                    requestCard.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                    requestCard.style.outline = "3px solid #236B3A";
+
+                    setTimeout(function () {
+                        requestCard.style.outline = "";
+                    }, 3000);
+
+                }
+
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>

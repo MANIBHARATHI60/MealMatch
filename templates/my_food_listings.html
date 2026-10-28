@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Food Listings | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* =========================================
+       MEALMATCH — MY FOOD LISTINGS
+    ========================================= */
+
+        .listings-with-sidebar {
+            --listing-green: #236b3a;
+            --listing-dark: #174b2b;
+            --listing-light: #edf7ef;
+            --listing-text: #26372b;
+            --listing-muted: #748078;
+
+            width: calc(100% - 250px);
+            max-width: none;
+            min-height: 100vh;
+            margin: 0 0 0 250px;
+            padding: 35px;
+            box-sizing: border-box;
+
+            background:
+                radial-gradient(ellipse at 5% 5%,
+                    rgba(111, 183, 127, 0.13),
+                    transparent 32%),
+                radial-gradient(ellipse at 95% 45%,
+                    rgba(111, 183, 127, 0.09),
+                    transparent 35%),
+                #f4f8f4;
+
+            color: var(--listing-text);
+            font-family: Arial, sans-serif;
+        }
+
+        .listings-with-sidebar *,
+        .listings-with-sidebar *::before,
+        .listings-with-sidebar *::after {
+            box-sizing: border-box;
+        }
+
+        /* ==============================
+   PAGE HEADER — DARK GREEN BANNER
+============================== */
+
+        .listings-with-sidebar .page-header {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+
+            padding: 38px 40px;
+            margin-bottom: 32px;
+
+            background:
+                radial-gradient(circle at 100% 0%,
+                    rgba(126, 211, 145, 0.22),
+                    transparent 38%),
+                linear-gradient(120deg,
+                    #174f2b 0%,
+                    #236b3a 52%,
+                    #398751 100%);
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 25px;
+
+            box-shadow:
+                0 8px 22px rgba(23, 79, 43, 0.12),
+                0 20px 42px rgba(23, 79, 43, 0.10);
+
+            animation: listings-enter 0.6s ease both;
+
+            transition:
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+
+        /* ==============================
+   DECORATIVE CIRCLES
+============================== */
+
+        .listings-with-sidebar .page-header::before {
+            content: "";
+            position: absolute;
+
+            width: 280px;
+            height: 280px;
+
+            top: -165px;
+            right: -65px;
+
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 0 24px rgba(255, 255, 255, 0.025),
+                0 0 0 48px rgba(255, 255, 255, 0.02);
+
+            pointer-events: none;
+            z-index: -1;
+        }
+
+
+        .listings-with-sidebar .page-header::after {
+            content: "";
+            position: absolute;
+
+            width: 190px;
+            height: 190px;
+
+            right: 115px;
+            bottom: -145px;
+
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 50%;
+
+            pointer-events: none;
+            z-index: -1;
+        }
+
+
+        /* ==============================
+   BANNER HOVER EFFECT
+============================== */
+
+        @media (hover: hover) and (pointer: fine) {
+            .listings-with-sidebar .page-header:hover {
+                border-color: rgba(255, 255, 255, 0.22);
+
+                box-shadow:
+                    0 12px 28px rgba(23, 79, 43, 0.16),
+                    0 25px 48px rgba(23, 79, 43, 0.13);
+            }
+        }
+
+
+        /* ==============================
+   BANNER ENTRANCE ANIMATION
+============================== */
+
+        @keyframes listings-enter {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* ==============================
+   BANNER HEADING
+============================== */
+
+        .listings-with-sidebar .page-header h1 {
+            position: relative;
+            z-index: 1;
+
+            margin: 0 0 14px;
+
+            color: #ffffff;
+
+            font-size: clamp(28px, 3vw, 38px);
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.9px;
+
+            overflow-wrap: anywhere;
+        }
+
+
+        /* ==============================
+   BANNER DESCRIPTION
+============================== */
+
+        .listings-with-sidebar .page-header>p {
+            position: relative;
+            z-index: 1;
+
+            max-width: 580px;
+            margin: 0 0 24px;
+
+            color: #e0f0e3;
+
+            font-size: 15px;
+            line-height: 1.9;
+        }
+
+
+        /* ==============================
+   RESPONSIVE BANNER
+============================== */
+
+        @media (max-width: 768px) {
+            .listings-with-sidebar .page-header {
+                padding: 28px 24px;
+                border-radius: 20px;
+            }
+
+            .listings-with-sidebar .page-header h1 {
+                font-size: 28px;
+            }
+        }
+
+
+        @media (max-width: 500px) {
+            .listings-with-sidebar .page-header {
+                padding: 25px 20px;
+                margin-bottom: 23px;
+                border-radius: 17px;
+            }
+
+            .listings-with-sidebar .page-header h1 {
+                font-size: 26px;
+            }
+
+            .listings-with-sidebar .page-header>p {
+                font-size: 13px;
+            }
+        }
+
+        /* HEADER BUTTONS */
+
+        .listings-with-sidebar .back-button,
+        .listings-with-sidebar .share-button {
+            position: relative;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+
+            min-height: 45px;
+            margin: 5px 8px 0 0;
+            padding: 12px 19px;
+
+            border: 1px solid transparent;
+            border-radius: 10px;
+
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
+            text-decoration: none;
+
+            transition:
+                transform 0.22s ease,
+                box-shadow 0.22s ease,
+                background-color 0.22s ease,
+                border-color 0.22s ease;
+        }
+
+        .listings-with-sidebar .back-button {
+            color: #415247;
+            background: #ffffff;
+            border-color: #dce7de;
+        }
+
+        .listings-with-sidebar .back-button:hover {
+            color: #236b3a;
+            background: #f6fbf6;
+            border-color: #b9d7bf;
+            transform: translateY(-2px);
+
+            box-shadow: 0 5px 12px rgba(30, 70, 39, 0.06);
+        }
+
+        .listings-with-sidebar .share-button {
+            color: #ffffff;
+            background: linear-gradient(120deg, #236b3a, #32854b);
+
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.13);
+        }
+
+        .listings-with-sidebar .share-button:hover {
+            color: #ffffff;
+            background: linear-gradient(120deg, #1b582f, #287740);
+            transform: translateY(-3px);
+
+            box-shadow: 0 9px 18px rgba(35, 107, 58, 0.19);
+        }
+
+        .listings-with-sidebar .back-button:focus-visible,
+        .listings-with-sidebar .share-button:focus-visible {
+            outline: 3px solid #9ac9a4;
+            outline-offset: 3px;
+        }
+
+        /* LISTINGS GRID */
+
+        .listings-with-sidebar .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            align-items: stretch;
+            gap: 24px;
+        }
+
+        /* FOOD CARD */
+
+        .listings-with-sidebar .food-card {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+
+            min-width: 0;
+            overflow: hidden;
+
+            background: #ffffff;
+
+            border: 1px solid #e1eae2;
+            border-radius: 19px;
+
+            box-shadow:
+                0 3px 8px rgba(30, 60, 37, 0.025),
+                0 9px 22px rgba(30, 60, 37, 0.045);
+
+            animation: listings-enter 0.55s ease both;
+
+            transition:
+                transform 0.28s ease,
+                border-color 0.28s ease,
+                box-shadow 0.28s ease;
+        }
+
+        .listings-with-sidebar .food-card:hover {
+            transform: translateY(-6px);
+            border-color: #c7dfcb;
+
+            box-shadow:
+                0 7px 15px rgba(30, 60, 37, 0.045),
+                0 20px 38px rgba(30, 60, 37, 0.09);
+        }
+
+        /* FOOD IMAGE */
+
+        .listings-with-sidebar .food-image {
+            display: block;
+
+            width: 100%;
+            height: 205px;
+            flex-shrink: 0;
+
+            object-fit: cover;
+
+            background: linear-gradient(135deg,
+                    #edf6ee,
+                    #e0eee2);
+
+            transition: transform 0.45s ease;
+        }
+
+        .listings-with-sidebar .food-card:hover .food-image {
+            transform: scale(1.035);
+        }
+
+        .listings-with-sidebar .food-card {
+            isolation: isolate;
+        }
+
+        .listings-with-sidebar .food-card>.food-image {
+            position: relative;
+            z-index: -1;
+        }
+
+        /* FOOD DETAILS */
+
+        .listings-with-sidebar .food-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+
+            min-width: 0;
+            padding: 22px;
+        }
+
+        .listings-with-sidebar .food-details h2 {
+            margin: 0 0 18px;
+
+            color: #245b35;
+
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.4;
+            letter-spacing: -0.35px;
+
+            overflow-wrap: anywhere;
+        }
+
+        .listings-with-sidebar .food-details p {
+            display: block;
+            margin: 0 0 13px;
+
+            color: #657168;
+
+            font-size: 13px;
+            line-height: 1.7;
+
+            overflow-wrap: anywhere;
+        }
+
+        .listings-with-sidebar .food-details p strong {
+            color: #344b39;
+            font-weight: 700;
+        }
+
+        /* STATUS BADGE */
+
+        .listings-with-sidebar .status {
+            display: inline-block;
+
+            max-width: 100%;
+            margin: 3px 0 0;
+            padding: 7px 12px;
+
+            color: #236b3a;
+            background: #eaf6ec;
+
+            border: 1px solid #d4e9d8;
+            border-radius: 30px;
+
+            font-size: 12px;
+            font-weight: 750;
+            line-height: 1.4;
+            text-transform: capitalize;
+
+            overflow-wrap: anywhere;
+        }
+
+        /* DELETE AREA */
+
+        .listings-with-sidebar .listing-delete {
+            margin-top: auto;
+            padding-top: 17px;
+        }
+
+        .listings-with-sidebar .delete-food-button,
+        .listings-with-sidebar .confirm-delete-button,
+        .listings-with-sidebar .cancel-delete-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 43px;
+            padding: 11px 15px;
+
+            border-radius: 10px;
+
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 750;
+            line-height: 1.4;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .listings-with-sidebar .delete-food-button {
+            width: 100%;
+
+            color: #b33b3b;
+            background: #fffafa;
+
+            border: 1px solid #f0d8d8;
+        }
+
+        .listings-with-sidebar .delete-food-button:hover {
+            color: #ffffff;
+            background: #c74646;
+            border-color: #c74646;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 5px 12px rgba(199, 70, 70, 0.14);
+        }
+
+        .listings-with-sidebar .delete-confirmation {
+            margin-top: 12px;
+            padding: 15px;
+
+            background: #fff8f7;
+
+            border: 1px solid #f0d7d4;
+            border-radius: 13px;
+
+            animation: listings-enter 0.22s ease both;
+        }
+
+        .listings-with-sidebar .delete-confirmation[hidden] {
+            display: none !important;
+        }
+
+        .listings-with-sidebar .delete-confirmation p {
+            margin: 0 0 15px;
+
+            color: #795b58;
+
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .listings-with-sidebar .delete-confirmation p strong {
+            color: #a53333;
+        }
+
+        .listings-with-sidebar .delete-confirmation-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .listings-with-sidebar .delete-confirmation-actions form {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .listings-with-sidebar .confirm-delete-button {
+            width: 100%;
+
+            color: #ffffff;
+            background: #bd3f3f;
+
+            border: 1px solid #bd3f3f;
+        }
+
+        .listings-with-sidebar .confirm-delete-button:hover {
+            background: #a92f2f;
+            border-color: #a92f2f;
+            transform: translateY(-1px);
+        }
+
+        .listings-with-sidebar .cancel-delete-button {
+            color: #52645a;
+            background: #ffffff;
+
+            border: 1px solid #dce5de;
+        }
+
+        .listings-with-sidebar .cancel-delete-button:hover {
+            background: #edf4ee;
+            border-color: #bfd6c3;
+        }
+
+        .listings-with-sidebar .delete-food-button:focus-visible,
+        .listings-with-sidebar .confirm-delete-button:focus-visible,
+        .listings-with-sidebar .cancel-delete-button:focus-visible {
+            outline: 3px solid #9ac9a4;
+            outline-offset: 3px;
+        }
+
+        /* FLASH MESSAGES */
+
+        .listings-with-sidebar .flash-messages {
+            margin-bottom: 24px;
+        }
+
+        .listings-with-sidebar .flash-message {
+            padding: 15px 18px;
+            margin: 0 0 12px;
+
+            color: #236b3a;
+            background: #edf8ef;
+
+            border: 1px solid #c9e5ce;
+            border-radius: 12px;
+
+            font-size: 14px;
+            line-height: 1.7;
+
+            overflow-wrap: anywhere;
+        }
+
+        /* EMPTY STATE */
+
+        .listings-with-sidebar .empty-state {
+            padding: 55px 25px;
+
+            background:
+                radial-gradient(ellipse at 50% 0%,
+                    rgba(120, 192, 135, 0.12),
+                    transparent 65%),
+                #ffffff;
+
+            border: 1px dashed #b9d9c4;
+            border-radius: 22px;
+
+            text-align: center;
+
+            box-shadow: 0 8px 25px rgba(30, 70, 39, 0.04);
+
+            animation: listings-enter 0.55s ease both;
+        }
+
+        .listings-with-sidebar .empty-state h2 {
+            margin: 0 0 13px;
+
+            color: #245b35;
+
+            font-size: 25px;
+            line-height: 1.4;
+        }
+
+        .listings-with-sidebar .empty-state p {
+            max-width: 480px;
+            margin: 0 auto 22px;
+
+            color: #748078;
+
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        /* TABLET */
+
+        @media (max-width: 1200px) {
+            .listings-with-sidebar {
+                padding: 27px;
+            }
+
+            .listings-with-sidebar .listings-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 20px;
+            }
+        }
+
+        /* SIDEBAR LAYOUT */
+
+        @media (max-width: 768px) {
+            .listings-with-sidebar {
+                width: calc(100% - 210px);
+                margin-left: 210px;
+                padding: 18px;
+            }
+
+            .listings-with-sidebar .page-header {
+                padding: 28px 24px;
+                border-radius: 19px;
+            }
+
+            .listings-with-sidebar .page-header h1 {
+                font-size: 28px;
+            }
+
+            .listings-with-sidebar .listings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .listings-with-sidebar .food-image {
+                height: 220px;
+            }
+        }
+
+        /* SMALL MOBILE */
+
+        @media (max-width: 500px) {
+            .listings-with-sidebar {
+                width: 100%;
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .listings-with-sidebar .page-header {
+                padding: 25px 20px;
+                margin-bottom: 23px;
+            }
+
+            .listings-with-sidebar .page-header h1 {
+                font-size: 26px;
+            }
+
+            .listings-with-sidebar .page-header>p {
+                font-size: 13px;
+            }
+
+            .listings-with-sidebar .back-button,
+            .listings-with-sidebar .share-button {
+                width: 100%;
+                margin-right: 0;
+            }
+
+            .listings-with-sidebar .food-details {
+                padding: 20px;
+            }
+
+            .listings-with-sidebar .food-image {
+                height: 200px;
+            }
+        }
+
+        /* RESPECT REDUCED MOTION */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .listings-with-sidebar *,
+            .listings-with-sidebar *::before,
+            .listings-with-sidebar *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        /* ==========================================
+   ✨ MEALMATCH — PREMIUM ANIMATION EFFECTS
+========================================== */
+
+        /* 1. SMOOTH PAGE ENTRANCE */
+
+        .listings-with-sidebar {
+            animation: pageReveal 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        }
+
+        @keyframes pageReveal {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 4. FOOD CARDS — STAGGERED ENTRANCE */
+
+        .listings-with-sidebar .food-card:nth-child(3n + 1) {
+            animation-delay: 0.05s;
+        }
+
+        .listings-with-sidebar .food-card:nth-child(3n + 2) {
+            animation-delay: 0.12s;
+        }
+
+        .listings-with-sidebar .food-card:nth-child(3n + 3) {
+            animation-delay: 0.19s;
+        }
+
+
+        /* 5. MORE NOTICEABLE CARD HOVER */
+
+        .listings-with-sidebar .food-card {
+            transform: translateY(0);
+
+            transition:
+                transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1),
+                box-shadow 0.32s ease,
+                border-color 0.32s ease;
+        }
+
+        .listings-with-sidebar .food-card:hover {
+            transform: translateY(-8px);
+
+            border-color: #b5d8bd;
+
+            box-shadow:
+                0 8px 18px rgba(35, 107, 58, 0.06),
+                0 22px 42px rgba(35, 107, 58, 0.12),
+                0 0 0 1px rgba(72, 169, 104, 0.07);
+        }
+
+
+        /* 6. FOOD IMAGE ZOOM */
+
+        .listings-with-sidebar .food-card {
+            overflow: hidden;
+        }
+
+        .listings-with-sidebar .food-image {
+            transform: scale(1);
+
+            transition:
+                transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1),
+                filter 0.4s ease;
+        }
+
+        .listings-with-sidebar .food-card:hover .food-image {
+            transform: scale(1.07);
+            filter: saturate(1.08);
+        }
+
+
+        /* 7. FOOD TITLE HIGHLIGHT */
+
+        .listings-with-sidebar .food-details h2 {
+            transition:
+                color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .listings-with-sidebar .food-card:hover .food-details h2 {
+            color: #236b3a;
+            transform: translateX(3px);
+        }
+
+
+        /* 8. STATUS BADGE MICRO-INTERACTION */
+
+        .listings-with-sidebar .status {
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .listings-with-sidebar .food-card:hover .status {
+            background: #e0f2e4;
+            border-color: #c0e0c7;
+            transform: translateY(-1px);
+        }
+
+
+        /* 9. SHARE BUTTON SHIMMER */
+
+        .listings-with-sidebar .share-button {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+
+        .listings-with-sidebar .share-button::before {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            left: -120%;
+
+            width: 65%;
+            height: 100%;
+
+            background: linear-gradient(110deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.25),
+                    transparent);
+
+            transform: skewX(-22deg);
+
+            transition: left 0.65s ease;
+
+            pointer-events: none;
+        }
+
+        .listings-with-sidebar .share-button:hover::before {
+            left: 150%;
+        }
+
+
+        /* 10. BUTTON PRESS FEEDBACK */
+
+        .listings-with-sidebar .back-button:active,
+        .listings-with-sidebar .share-button:active,
+        .listings-with-sidebar .delete-food-button:active,
+        .listings-with-sidebar .confirm-delete-button:active,
+        .listings-with-sidebar .cancel-delete-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+
+        /* 11. EMPTY STATE HOVER */
+
+        .listings-with-sidebar .empty-state {
+            transition:
+                border-color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .listings-with-sidebar .empty-state:hover {
+            border-color: #8fc69b;
+
+            box-shadow:
+                0 12px 28px rgba(35, 107, 58, 0.07),
+                0 0 0 1px rgba(72, 169, 104, 0.04);
+
+            transform: translateY(-3px);
+        }
+
+
+        /* 12. ACCESSIBILITY */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .listings-with-sidebar,
+            .listings-with-sidebar *,
+            .listings-with-sidebar *::before,
+            .listings-with-sidebar *::after {
+                animation: none !important;
+                transition: none !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="listings-container listings-with-sidebar">
+
+        <header class="page-header">
+            <h1>📦 My Food Listings</h1>
+
+            <p>
+                Manage and track the surplus food you've shared
+                with the MealMatch community.
+            </p>
+
+            <a href="{{ url_for('dashboard') }}" class="share-button">
+                ← Dashboard
+            </a>
+
+            <a href="{{ url_for('share_food') }}" class="share-button">
+                + Share New Food
+            </a>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if food_listings %}
+
+        <section class="listings-grid">
+
+            {% for food in food_listings %}
+
+            <article class="food-card">
+
+                {% if food.image_filename %}
+                <img class="food-image" src="{{ url_for('static', filename='uploads/' ~ food.image_filename) }}"
+                    alt="{{ food.food_name }}">
+                {% else %}
+                <div class="food-image" style="display:flex; align-items:center;
+                                        justify-content:center; font-size:50px;">
+                    🍱
+                </div>
+                {% endif %}
+
+                <div class="food-details">
+
+                    <h2>{{ food.food_name }}</h2>
+
+                    <p>
+                        <strong>Category:</strong>
+                        {{ food.food_category or 'Not specified' }}
+                    </p>
+
+                    <p>
+                        <strong>Food Type:</strong>
+                        {{ food.food_type or 'Not specified' }}
+                    </p>
+
+                    <p>
+                        <strong>Price per Meal:</strong>
+                        {% if food.price is not none %}
+                        ₹{{ "%.2f"|format(food.price|float) }}
+                        {% else %}
+                        ₹0.00
+                        {% endif %}
+                    </p>
+
+                    <p>
+                        <strong>Quantity:</strong>
+                        {{ food.quantity }}
+                    </p>
+                    <p>
+                        <strong>Pickup location:</strong>
+                        {{ food.location }}
+                    </p>
+
+                    <p>
+                        <strong>Available until:</strong>
+                        {{ food.available_until }}
+                    </p>
+
+                    <p>
+                        <strong>Listing status:</strong>
+                        <span class="status">
+                            {{ food.status }}
+                        </span>
+                    </p>
+
+                    <div class="listing-delete">
+                        <button type="button" class="delete-food-button js-delete-start glossy-green-button">
+                            Delete listing
+                        </button>
+
+                        <div class="delete-confirmation" hidden>
+                            <p>
+                                <strong>Are you sure?</strong><br>
+                                Deleting this listing is permanent. You’ll need to create it again to offer this food
+                                later.
+                            </p>
+
+                            <div class="delete-confirmation-actions">
+                                <form method="POST" action="{{ url_for('delete_food', listing_id=food.id) }}">
+                                    <button type="submit" class="confirm-delete-button glossy-green-button">
+                                        Yes, delete listing
+                                    </button>
+                                </form>
+
+                                <button type="button" class="cancel-delete-button">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+        {% else %}
+
+        <section class="empty-state">
+            <h2>🍲 No Food Listings Yet</h2>
+
+            <p>
+                You haven't shared any surplus food yet.
+                Create your first listing to connect with Receivers!
+            </p>
+
+            <a href="{{ url_for('share_food') }}" class="share-button">
+                Share Food
+            </a>
+        </section>
+
+        {% endif %}
+
+    </main>
+
+    <script>
+        document.addEventListener("click", function (event) {
+            const startButton = event.target.closest(".js-delete-start");
+
+            if (startButton) {
+                const area = startButton.closest(".listing-delete");
+                startButton.hidden = true;
+                area.querySelector(".delete-confirmation").hidden = false;
+                return;
+            }
+
+            const cancelButton = event.target.closest(".cancel-delete-button");
+
+            if (cancelButton) {
+                const area = cancelButton.closest(".listing-delete");
+                area.querySelector(".delete-confirmation").hidden = true;
+                area.querySelector(".js-delete-start").hidden = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

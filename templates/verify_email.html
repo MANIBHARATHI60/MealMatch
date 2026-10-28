@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify your email | MealMatch</title>
+</head>
+
+<body>
+    {% if verified %}
+    <h1>Email verified!</h1>
+    <p>{{ success }}</p>
+    <a href="{{ url_for('login') }}">Go to login</a>
+    {% else %}
+    <h1>Check your email</h1>
+    <p>Enter the six-digit code we sent to your email address.</p>
+
+    <form action="{{ url_for('verify_email') }}" method="POST">
+        <label for="otp">Verification code</label>
+        <input type="text" id="otp" name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required>
+        <button type="submit">Verify email</button>
+    </form>
+    {% endif %}
+</body>
+
+</html>

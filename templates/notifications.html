@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* =========================================
+           GENERAL PAGE STYLING
+        ========================================= */
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f6f3;
+            color: #26352b;
+        }
+
+        .notifications-page {
+            margin-left: 250px;
+            padding: 32px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+
+        /* =========================================
+           HERO BANNER
+        ========================================= */
+
+        .notifications-banner {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+
+            padding: 38px 42px;
+            margin-bottom: 32px;
+
+            background: linear-gradient(120deg, #174f2b 0%, #236b3a 55%, #398751 100%);
+            border-radius: 24px;
+            overflow: hidden;
+
+            box-shadow: 0 12px 30px rgba(35, 107, 58, 0.16);
+
+            animation: bannerEntrance 0.65s ease both;
+        }
+
+        .notifications-banner::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            right: 100px;
+            top: -190px;
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .notifications-banner::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -75px;
+            bottom: -145px;
+
+            border: 35px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .banner-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 7px 13px;
+            margin-bottom: 17px;
+
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 30px;
+
+            color: #e5f7e9;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .banner-eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #b9f4c8;
+            box-shadow: 0 0 10px rgba(185, 244, 200, 0.7);
+        }
+
+        .banner-content h1 {
+            margin: 0 0 13px;
+            color: #ffffff;
+            font-size: clamp(30px, 3vw, 43px);
+            line-height: 1.2;
+            letter-spacing: -1.2px;
+            overflow-wrap: anywhere;
+        }
+
+        .banner-content>p {
+            max-width: 510px;
+            margin: 0;
+            color: #e0f0e4;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .banner-bottom-info {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .banner-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 10px 15px;
+
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 11px;
+
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .banner-status strong {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 23px;
+            height: 23px;
+            padding: 0 5px;
+            box-sizing: border-box;
+
+            background: #ffffff;
+            border-radius: 7px;
+            color: #236b3a;
+            font-size: 12px;
+        }
+
+        .banner-decoration {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 158px;
+            height: 158px;
+            flex-shrink: 0;
+
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 36px;
+
+            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.04);
+
+            transform: rotate(5deg);
+            transition: transform 0.35s ease;
+        }
+
+        .banner-bell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 105px;
+            height: 105px;
+
+            background: linear-gradient(145deg, #ffffff, #e5f4e8);
+            border-radius: 30px;
+
+            font-size: 55px;
+
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.13);
+
+            animation: bellFloat 3s ease-in-out infinite;
+        }
+
+        .banner-notification-dot {
+            position: absolute;
+            top: 18px;
+            right: 15px;
+
+            width: 20px;
+            height: 20px;
+
+            background: #ffcc70;
+            border: 4px solid #236b3a;
+            border-radius: 50%;
+
+            box-sizing: content-box;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .notifications-banner {
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+            }
+
+            .notifications-banner:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 18px 38px rgba(35, 107, 58, 0.22);
+            }
+
+            .notifications-banner:hover .banner-decoration {
+                transform: rotate(0deg) scale(1.05);
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.12);
+            }
+
+            .notifications-banner:hover .banner-bell {
+                transform: translateY(-3px);
+            }
+        }
+
+
+        /* =========================================
+           SECTION HEADING
+        ========================================= */
+
+        .notifications-section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+
+            margin-bottom: 21px;
+
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .section-title-group h2 {
+            margin: 0 0 6px;
+            color: #26352b;
+            font-size: 23px;
+            letter-spacing: -0.4px;
+        }
+
+        .section-title-group p {
+            margin: 0;
+            color: #78847b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .section-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 9px 14px;
+
+            background: #e6f4e9;
+            border: 1px solid #d2e9d7;
+            border-radius: 10px;
+
+            color: #236b3a;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .section-count-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2e914c;
+        }
+
+
+        /* =========================================
+           NOTIFICATION LIST
+        ========================================= */
+
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+
+        /* =========================================
+           NOTIFICATION CARD
+        ========================================= */
+
+        .notification-card {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 22px;
+
+            padding: 23px;
+
+            background: #ffffff;
+            border: 1px solid #e2ebe3;
+            border-left: 5px solid #3b9654;
+            border-radius: 17px;
+
+            box-shadow: 0 4px 15px rgba(25, 65, 38, 0.045);
+
+            overflow: hidden;
+            min-width: 0;
+            box-sizing: border-box;
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .notification-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            width: 115px;
+            height: 115px;
+
+            background: radial-gradient(circle at top right,
+                    rgba(80, 165, 99, 0.09),
+                    transparent 72%);
+
+            pointer-events: none;
+        }
+
+        .notification-card:nth-child(2) {
+            animation-delay: 0.07s;
+        }
+
+        .notification-card:nth-child(3) {
+            animation-delay: 0.14s;
+        }
+
+        .notification-card:nth-child(4) {
+            animation-delay: 0.21s;
+        }
+
+        .notification-card:nth-child(n+5) {
+            animation-delay: 0.25s;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .notification-card:hover {
+                transform: translateY(-5px);
+                border-color: #c6dfcc;
+                border-left-color: #236b3a;
+                box-shadow: 0 13px 30px rgba(35, 107, 58, 0.11);
+            }
+
+            .notification-card:hover .notification-food-image {
+                transform: scale(1.045);
+            }
+
+            .notification-card:hover .notification-icon,
+            .notification-card:hover .notification-food-placeholder {
+                transform: scale(1.04);
+            }
+        }
+
+
+        /* =========================================
+           FOOD IMAGE AND ICON
+        ========================================= */
+
+        .notification-food-image,
+        .notification-food-placeholder {
+            position: relative;
+            z-index: 1;
+
+            display: block;
+            width: 145px;
+            height: 145px;
+            flex-shrink: 0;
+
+            border: 1px solid #dfeae1;
+            border-radius: 14px;
+
+            background: #eaf5ed;
+            box-sizing: border-box;
+        }
+
+        .notification-food-image {
+            object-fit: cover;
+
+            transition:
+                transform 0.35s ease,
+                box-shadow 0.35s ease;
+        }
+
+        .notification-food-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+
+            transition: transform 0.25s ease;
+        }
+
+        .notification-icon {
+            position: relative;
+            z-index: 1;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+
+            background: linear-gradient(145deg, #e8f6ec, #d9efdf);
+            border: 1px solid #d1e7d6;
+            border-radius: 17px;
+
+            font-size: 26px;
+
+            transition: transform 0.25s ease;
+        }
+
+
+        /* =========================================
+           NOTIFICATION CONTENT
+        ========================================= */
+
+        .notification-content {
+            position: relative;
+            z-index: 1;
+
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-content h2 {
+            margin: 1px 0 9px;
+
+            color: #26352b;
+            font-size: 21px;
+            line-height: 1.4;
+            letter-spacing: -0.3px;
+
+            overflow-wrap: anywhere;
+        }
+
+        .notification-content p {
+            margin: 0 0 12px;
+
+            color: #59665d;
+            font-size: 15px;
+            line-height: 1.7;
+
+            overflow-wrap: anywhere;
+        }
+
+        .notification-organisation {
+            display: inline-block;
+
+            margin: 0 0 11px !important;
+            padding: 7px 11px;
+
+            background: #f0f7f1;
+            border: 1px solid #e0eee2;
+            border-radius: 8px;
+
+            color: #236b3a !important;
+            font-size: 13px !important;
+            font-weight: bold;
+        }
+
+
+        /* =========================================
+           NEW BADGE
+        ========================================= */
+
+        .unread-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 11px;
+            padding: 6px 11px;
+
+            background: #e5f5e9;
+            border: 1px solid #d1ebd8;
+            border-radius: 30px;
+
+            color: #236b3a;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .unread-dot {
+            width: 7px;
+            height: 7px;
+            flex-shrink: 0;
+
+            background: #2b9149;
+            border-radius: 50%;
+
+            box-shadow: 0 0 0 3px rgba(43, 145, 73, 0.12);
+        }
+
+
+        /* =========================================
+           DATE AND VIEW DETAILS BUTTON
+        ========================================= */
+
+        .notification-date {
+            display: inline-block;
+            margin-top: 2px;
+
+            color: #829087;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .notification-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            margin-top: 15px;
+            padding: 12px 18px;
+
+            background: #236b3a;
+            border: 1px solid #236b3a;
+            border-radius: 10px;
+
+            color: #ffffff;
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            box-sizing: border-box;
+
+            transition:
+                background-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .notification-action:hover {
+            background: #184f2b;
+            border-color: #184f2b;
+            color: #ffffff;
+
+            box-shadow: 0 6px 15px rgba(35, 107, 58, 0.23);
+            transform: translateY(-3px);
+        }
+
+        .mark-all-read-button {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+
+        .mark-all-read-button::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -80%;
+            width: 45%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.24);
+            transform: rotate(25deg);
+            transition: left 0.55s ease;
+            pointer-events: none;
+        }
+
+        .mark-all-read-button:hover::before {
+            left: 140%;
+        }
+
+        .notification-action:focus-visible {
+            outline: 3px solid #a8d8b3;
+            outline-offset: 3px;
+        }
+
+        .action-arrow {
+            display: inline-block;
+            font-size: 17px;
+
+            transition: transform 0.2s ease;
+        }
+
+        .notification-action:hover .action-arrow {
+            transform: translateX(4px);
+        }
+
+
+        /* =========================================
+           EMPTY STATE
+        ========================================= */
+
+        .empty-state {
+            position: relative;
+            padding: 55px 25px;
+
+            text-align: center;
+
+            background: linear-gradient(145deg, #ffffff, #f6fbf7);
+            border: 1px solid #e0ebe2;
+            border-radius: 21px;
+
+            box-shadow: 0 8px 25px rgba(25, 65, 38, 0.05);
+
+            overflow: hidden;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .empty-state::before {
+            content: "";
+            position: absolute;
+
+            width: 190px;
+            height: 190px;
+            top: -130px;
+            right: -70px;
+
+            background: #e8f5eb;
+            border-radius: 50%;
+        }
+
+        .empty-icon {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 88px;
+            height: 88px;
+
+            margin: 0 auto 22px;
+
+            background: linear-gradient(145deg, #e6f5e9, #d5eddc);
+            border: 1px solid #cfe7d4;
+            border-radius: 28px;
+
+            font-size: 42px;
+
+            box-shadow: 0 8px 20px rgba(35, 107, 58, 0.09);
+        }
+
+        .empty-state h2 {
+            position: relative;
+
+            margin: 0 0 12px;
+
+            color: #236b3a;
+            font-size: 26px;
+        }
+
+        .empty-state p {
+            position: relative;
+
+            max-width: 430px;
+            margin: 0 auto;
+
+            color: #68756b;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+
+        /* =========================================
+           ANIMATIONS
+        ========================================= */
+
+        @keyframes bannerEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bellFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+
+        /* =========================================
+           TABLET SCREENS
+        ========================================= */
+
+        @media (max-width: 1200px) {
+            .notifications-page {
+                padding: 26px;
+            }
+
+            .notifications-banner {
+                padding: 32px;
+            }
+
+            .banner-decoration {
+                width: 130px;
+                height: 130px;
+                border-radius: 30px;
+            }
+
+            .banner-bell {
+                width: 88px;
+                height: 88px;
+                border-radius: 25px;
+                font-size: 45px;
+            }
+
+            .notification-card {
+                padding: 20px;
+                gap: 17px;
+            }
+
+            .notification-food-image,
+            .notification-food-placeholder {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+
+        /* =========================================
+           SMALL SCREENS
+        ========================================= */
+
+        @media (max-width: 768px) {
+            .notifications-page {
+                margin-left: 210px;
+                padding: 20px;
+            }
+
+            .notifications-banner {
+                padding: 26px;
+                gap: 15px;
+                border-radius: 19px;
+            }
+
+            .banner-content h1 {
+                font-size: 29px;
+                letter-spacing: -0.6px;
+            }
+
+            .banner-content>p {
+                font-size: 14px;
+            }
+
+            .banner-decoration {
+                width: 90px;
+                height: 90px;
+                border-radius: 24px;
+            }
+
+            .banner-bell {
+                width: 64px;
+                height: 64px;
+                border-radius: 19px;
+                font-size: 33px;
+            }
+
+            .banner-notification-dot {
+                top: 8px;
+                right: 7px;
+                width: 13px;
+                height: 13px;
+                border-width: 3px;
+            }
+
+            .banner-eyebrow {
+                font-size: 9px;
+                padding: 6px 9px;
+            }
+
+            .banner-bottom-info {
+                margin-top: 18px;
+            }
+
+            .banner-status {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .notifications-section-heading {
+                align-items: flex-start;
+            }
+
+            .section-title-group h2 {
+                font-size: 21px;
+            }
+
+            .notification-card {
+                padding: 17px;
+                gap: 14px;
+            }
+
+            .notification-food-image,
+            .notification-food-placeholder {
+                width: 100px;
+                height: 100px;
+            }
+
+            .notification-content h2 {
+                font-size: 18px;
+            }
+
+            .notification-content p {
+                font-size: 14px;
+            }
+
+            .notification-icon {
+                width: 45px;
+                height: 45px;
+                border-radius: 13px;
+                font-size: 21px;
+            }
+        }
+
+
+        /* =========================================
+           MOBILE SCREENS
+        ========================================= */
+
+        @media (max-width: 500px) {
+            .notifications-page {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .notifications-banner {
+                padding: 23px 20px;
+                margin-bottom: 25px;
+            }
+
+            .banner-content h1 {
+                font-size: 27px;
+            }
+
+            .banner-content>p {
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+            .banner-decoration {
+                width: 60px;
+                height: 60px;
+                border-radius: 17px;
+            }
+
+            .banner-bell {
+                width: 44px;
+                height: 44px;
+                border-radius: 13px;
+                font-size: 24px;
+            }
+
+            .banner-notification-dot {
+                top: 4px;
+                right: 3px;
+                width: 10px;
+                height: 10px;
+                border-width: 2px;
+            }
+
+            .banner-eyebrow {
+                margin-bottom: 12px;
+                font-size: 8px;
+                letter-spacing: 1px;
+            }
+
+            .banner-bottom-info {
+                gap: 8px;
+                margin-top: 17px;
+            }
+
+            .banner-status {
+                gap: 6px;
+                padding: 7px 9px;
+                font-size: 11px;
+            }
+
+            .banner-status strong {
+                min-width: 20px;
+                height: 20px;
+                font-size: 11px;
+            }
+
+            .notifications-section-heading {
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .section-title-group h2 {
+                font-size: 20px;
+            }
+
+            .section-title-group p {
+                font-size: 13px;
+            }
+
+            .section-count {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .notifications-list {
+                gap: 14px;
+            }
+
+            .notification-card {
+                gap: 12px;
+                padding: 13px;
+                border-radius: 13px;
+                border-left-width: 4px;
+            }
+
+            .notification-food-image,
+            .notification-food-placeholder {
+                width: 78px;
+                height: 78px;
+                border-radius: 10px;
+            }
+
+            .notification-food-placeholder {
+                font-size: 29px;
+            }
+
+            .notification-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 17px;
+            }
+
+            .notification-content h2 {
+                margin-top: 1px;
+                font-size: 16px;
+            }
+
+            .notification-content p {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            .notification-organisation {
+                padding: 6px 8px;
+                font-size: 11px !important;
+            }
+
+            .unread-label {
+                gap: 6px;
+                padding: 5px 8px;
+                font-size: 9px;
+            }
+
+            .notification-date {
+                font-size: 11px;
+                overflow-wrap: anywhere;
+            }
+
+            .notification-action {
+                gap: 7px;
+                margin-top: 11px;
+                padding: 9px 11px;
+                font-size: 12px;
+            }
+
+            .empty-state {
+                padding: 38px 18px;
+                border-radius: 17px;
+            }
+
+            .empty-icon {
+                width: 70px;
+                height: 70px;
+                border-radius: 22px;
+                font-size: 34px;
+            }
+
+            .empty-state h2 {
+                font-size: 22px;
+            }
+
+            .empty-state p {
+                font-size: 14px;
+            }
+        }
+
+
+        /* =========================================
+           ACCESSIBILITY
+        ========================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .notifications-banner,
+            .notification-card,
+            .notifications-section-heading,
+            .empty-state {
+                animation: none;
+            }
+
+            .banner-bell {
+                animation: none;
+            }
+
+            .banner-decoration,
+            .notification-card,
+            .notification-icon,
+            .notification-food-image,
+            .notification-food-placeholder,
+            .notification-action,
+            .action-arrow {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="notifications-page">
+
+        <!-- =====================================
+             HERO BANNER
+        ====================================== -->
+
+        <!-- PREMIUM INCOMING REQUESTS BANNER -->
+
+        <section class="notifications-banner">
+
+            <div class="banner-content">
+
+                <div class="banner-eyebrow">
+                    <span class="banner-eyebrow-dot"></span>
+                    MEALMATCH UPDATES
+                </div>
+
+                <h1>Your Notifications</h1>
+
+                <p>
+                    Stay connected with your food requests, discover important
+                    updates, and keep track of your MealMatch activities.
+                </p>
+
+                <div class="banner-bottom-info">
+
+                    <div class="banner-status">
+                        <span>Unread notifications</span>
+
+                        <strong>
+                            {{ unread_count if unread_count is defined else notifications|length }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="banner-decoration" aria-hidden="true">
+
+                <div class="banner-bell">
+                    🔔
+                </div>
+
+                <span class="banner-notification-dot"></span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             NOTIFICATION SECTION HEADING
+        ====================================== -->
+
+        <div class="notifications-section-heading">
+
+            <div class="section-title-group">
+
+                <h2>Recent Updates</h2>
+
+                <p>
+                    Important updates about your food requests.
+                </p>
+
+            </div>
+
+
+            {% if notifications %}
+
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================
+             NOTIFICATION LIST
+        ====================================== -->
+
+        {% if notifications %}
+
+        <section class="notifications-list">
+
+            {% for notification in notifications %}
+
+            <article class="notification-card {% if not notification.is_read %}unread{% endif %}">
+
+                <!-- FOOD IMAGE -->
+
+                {% if notification.food_name %}
+
+                {% if notification.image_filename %}
+
+                <img class="notification-food-image"
+                    src="{{ url_for('static', filename='uploads/' ~ notification.image_filename) }}"
+                    alt="{{ notification.food_name }}" loading="lazy">
+
+                {% else %}
+
+                <div class="notification-food-placeholder">
+                    🍱
+                </div>
+
+                {% endif %}
+
+                {% else %}
+
+                <div class="notification-icon">
+                    🔔
+                </div>
+
+                {% endif %}
+
+
+                <!-- NOTIFICATION DETAILS -->
+
+                <div class="notification-content">
+
+                    {% if not notification.is_read %}
+
+                    <span class="unread-label">
+                        <span class="unread-dot"></span>
+                        NEW
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if notification.food_name %}
+
+                    <h2>{{ notification.food_name }}</h2>
+
+                    {% if notification.organisation_name %}
+
+                    <p class="notification-organisation">
+                        Provider: {{ notification.organisation_name }}
+                    </p>
+
+                    {% endif %}
+
+                    <p>Your food request has been accepted!</p>
+
+                    {% else %}
+
+                    <h2>{{ notification.title }}</h2>
+
+                    <p>{{ notification.message }}</p>
+
+                    {% endif %}
+
+
+                    <span class="notification-date">
+                        {{ notification.created_at }}
+                    </span>
+
+
+                    {% if notification.link %}
+
+                    <br>
+
+                    <a href="{{ url_for('open_notification', notification_id=notification.id) }}"
+                        class="notification-action glossy-green-button">
+                        View Details
+                        <span class="action-arrow">→</span>
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        <!-- =====================================
+             EMPTY STATE
+        ====================================== -->
+
+        {% else %}
+
+        <section class="empty-state">
+
+            <div class="empty-icon">
+                🔔
+            </div>
+
+            <h2>You're All Caught Up!</h2>
+
+            <p>
+                You don't have any unread notifications right now.
+                When there's an update about your food requests,
+                you'll find it here.
+            </p>
+
+        </section>
+
+        {% endif %}
+
+    </main>
+
+
+
+    <script>
+        // Remove a notification immediately when View Details is clicked.
+        document.querySelectorAll(".notification-action").forEach(function (link) {
+
+            link.addEventListener("click", function () {
+
+                const card = link.closest(".notification-card");
+
+                if (card) {
+                    card.style.transition =
+                        "opacity 160ms ease, transform 160ms ease";
+
+                    card.style.opacity = "0";
+                    card.style.transform = "translateX(12px)";
+
+                    setTimeout(function () {
+                        card.remove();
+                    }, 160);
+                }
+
+            });
+
+        });
+
+
+        // Refresh the unread notification list when returning
+        // to this page using the browser Back button.
+        window.addEventListener("pageshow", function (event) {
+
+            if (event.persisted) {
+                window.location.reload();
+            }
+
+        });
+    </script>
+
+
+
+</body>
+
+</html>

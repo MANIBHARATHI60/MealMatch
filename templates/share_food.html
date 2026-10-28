@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Food | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* ==========================================
+       MEALMATCH — PREMIUM SHARE FOOD EXPERIENCE
+    ========================================== */
+
+        .share-food-page {
+            --sf-green: #236b3a;
+            --sf-deep: #174b2b;
+            --sf-bright: #48a968;
+            --sf-text: #203529;
+            --sf-muted: #718077;
+
+            position: relative;
+            isolation: isolate;
+
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+
+            width: auto;
+            min-height: 100vh;
+            margin: 0 0 0 250px;
+            padding: 42px 32px 60px;
+
+            box-sizing: border-box;
+
+            background:
+                radial-gradient(ellipse at 12% 12%,
+                    rgba(120, 195, 140, 0.18),
+                    transparent 32%),
+                radial-gradient(ellipse at 90% 70%,
+                    rgba(101, 172, 120, 0.13),
+                    transparent 35%),
+                linear-gradient(145deg, #f3f8f3 0%, #edf5ef 48%, #f8faf8 100%);
+
+            color: var(--sf-text);
+            font-family: Arial, sans-serif;
+        }
+
+        .share-food-page *,
+        .share-food-page *::before,
+        .share-food-page *::after {
+            box-sizing: border-box;
+        }
+
+        /* ==========================================
+       FLOATING FORM CARD
+    ========================================== */
+
+        .share-food-page .login-card {
+            position: relative;
+            isolation: isolate;
+
+            width: 100%;
+            max-width: 800px;
+            min-width: 0;
+            margin: 0 auto;
+            padding: 42px;
+
+            background: rgba(255, 255, 255, 0.96);
+
+            border: 1px solid rgba(207, 225, 211, 0.95);
+            border-radius: 28px;
+
+            box-shadow:
+                0 2px 5px rgba(27, 67, 39, 0.025),
+                0 12px 28px rgba(27, 67, 39, 0.055),
+                0 32px 70px rgba(27, 67, 39, 0.075);
+
+            overflow: hidden;
+
+            animation: sf-enter 0.65s cubic-bezier(.2, .75, .25, 1) both;
+        }
+
+        /* Gradient top border */
+
+        .share-food-page .login-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 6px;
+
+            background: linear-gradient(90deg,
+                    #174b2b,
+                    #319451,
+                    #81ce92,
+                    #319451);
+
+            background-size: 200% 100%;
+            animation: sf-gradient 5s ease infinite;
+        }
+
+        /* Soft decorative glow */
+
+        .share-food-page .login-card::after {
+            content: "";
+            position: absolute;
+            top: -100px;
+            right: -100px;
+
+            width: 250px;
+            height: 250px;
+
+            border-radius: 50%;
+
+            background: radial-gradient(circle,
+                    rgba(119, 195, 137, 0.12),
+                    rgba(119, 195, 137, 0));
+
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes sf-enter {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes sf-gradient {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* ==========================================
+   PREMIUM SHARE FOOD BANNER
+========================================== */
+
+        .share-food-page .sf-hero {
+            position: relative;
+            isolation: isolate;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            width: 100%;
+            margin-bottom: 26px;
+            padding: 30px;
+            overflow: hidden;
+
+            background:
+                radial-gradient(circle at 78% 15%,
+                    rgba(151, 224, 166, 0.20),
+                    transparent 32%),
+                linear-gradient(120deg,
+                    #174f2b 0%,
+                    #236b3a 52%,
+                    #398751 100%);
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 21px;
+            box-shadow: 0 10px 26px rgba(35, 107, 58, 0.16);
+
+            animation: sf-banner-entrance 0.7s ease both;
+
+            transition:
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+        }
+
+        .share-food-page .sf-hero::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 260px;
+            height: 260px;
+            top: -170px;
+            right: 70px;
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 0 22px rgba(255, 255, 255, 0.025),
+                0 0 0 48px rgba(255, 255, 255, 0.02);
+
+            pointer-events: none;
+            transition: transform 0.6s ease;
+        }
+
+        .share-food-page .sf-hero::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 150px;
+            height: 150px;
+            right: -55px;
+            bottom: -100px;
+
+            border: 25px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+
+            pointer-events: none;
+            transition: transform 0.6s ease;
+        }
+
+        .share-food-page .sf-hero-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .share-food-page .sf-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 17px;
+            padding: 8px 13px;
+
+            color: #e6f7e9;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 30px;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+
+            backdrop-filter: blur(8px);
+
+            transition:
+                background-color 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .share-food-page .sf-eyebrow-dot {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+
+            background: #a8f0b7;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(168, 240, 183, 0.65);
+        }
+
+        .share-food-page .sf-eyebrow-dot::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+
+            border: 1px solid rgba(168, 240, 183, 0.55);
+            border-radius: 50%;
+
+            animation: sf-dot-pulse 2s ease-out infinite;
+        }
+
+        .share-food-page .sf-hero h2 {
+            margin: 0 0 12px;
+            padding: 0;
+
+            color: #ffffff;
+            font-size: clamp(26px, 3.5vw, 36px);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.8px;
+
+            overflow-wrap: anywhere;
+        }
+
+        .share-food-page .sf-hero h2::after {
+            content: none;
+        }
+
+        .share-food-page .sf-hero-content p {
+            max-width: 480px;
+            margin: 0;
+
+            color: #e0f0e4;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .share-food-page .sf-hero-art {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            width: 105px;
+            height: 105px;
+
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 22px;
+
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.13);
+            backdrop-filter: blur(8px);
+
+            transform: rotate(5deg);
+
+            transition:
+                transform 0.4s ease,
+                background-color 0.4s ease,
+                box-shadow 0.4s ease;
+        }
+
+        .share-food-page .sf-hero-art>span:first-child {
+            font-size: 53px;
+            line-height: 1;
+            filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.15));
+        }
+
+        .share-food-page .sf-art-leaf {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+
+            color: #c1f2ca;
+            font-size: 19px;
+
+            animation: sf-star-float 3s ease-in-out infinite;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .share-food-page .sf-hero:hover {
+                box-shadow: 0 15px 34px rgba(35, 107, 58, 0.23);
+            }
+
+            .share-food-page .sf-hero:hover::before {
+                transform: translate(-10px, 10px) scale(1.06);
+            }
+
+            .share-food-page .sf-hero:hover::after {
+                transform: translate(-8px, -8px);
+            }
+
+            .share-food-page .sf-hero:hover .sf-eyebrow {
+                background: rgba(255, 255, 255, 0.18);
+                transform: translateY(-2px);
+            }
+
+            .share-food-page .sf-hero:hover .sf-hero-art {
+                transform: rotate(0deg) translateY(-4px) scale(1.04);
+                background: rgba(255, 255, 255, 0.21);
+                box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+            }
+        }
+
+        @keyframes sf-banner-entrance {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes sf-dot-pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        @keyframes sf-star-float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        /* ==========================================
+       FORM LABELS
+    ========================================== */
+
+        .share-food-page form label {
+            display: block;
+
+            margin: 23px 0 9px;
+
+            color: #344b39;
+
+            font-size: 13px;
+            font-weight: 750;
+            line-height: 1.5;
+
+            letter-spacing: 0.15px;
+        }
+
+        /* ==========================================
+       PREMIUM INPUT FIELDS
+    ========================================== */
+
+        .share-food-page .food-form-input,
+        .share-food-page .food-form-select,
+        .share-food-page form input[type="text"],
+        .share-food-page form input[type="number"],
+        .share-food-page form input[type="datetime-local"],
+        .share-food-page form select {
+            display: block;
+
+            width: 100%;
+            min-width: 0;
+            min-height: 52px;
+
+            margin: 0;
+            padding: 14px 15px;
+
+            color: #26372b;
+            background: #fbfdfb;
+
+            border: 1px solid #dce7de;
+            border-radius: 12px;
+
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+
+            box-shadow: inset 0 1px 2px rgba(30, 57, 37, 0.015);
+
+            transition:
+                border-color 0.25s ease,
+                background-color 0.25s ease,
+                box-shadow 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .share-food-page .food-form-input::placeholder {
+            color: #9aa79d;
+            opacity: 1;
+        }
+
+        .share-food-page .food-form-input:hover,
+        .share-food-page .food-form-select:hover {
+            background: #ffffff;
+            border-color: #b2d0b9;
+        }
+
+        .share-food-page .food-form-input:focus,
+        .share-food-page .food-form-select:focus,
+        .share-food-page form input:focus,
+        .share-food-page form select:focus {
+            outline: none;
+
+            background: #ffffff;
+            border-color: #4d9963;
+
+            box-shadow:
+                0 0 0 4px rgba(55, 143, 79, 0.10),
+                0 5px 15px rgba(35, 107, 58, 0.055);
+        }
+
+        /* ==========================================
+       CUSTOM FOOD CATEGORY
+    ========================================== */
+
+        #custom-food-category-box {
+            margin-top: 13px;
+            padding: 17px;
+
+            background: linear-gradient(135deg, #f0f8f1, #f8fcf8);
+
+            border: 1px solid #dcebdd;
+            border-radius: 15px;
+
+            animation: sf-enter 0.25s ease both;
+        }
+
+        #custom-food-category-box label {
+            margin-top: 0;
+        }
+
+        /* ==========================================
+       FIELD HINT
+    ========================================== */
+
+        .share-food-page .field-hint {
+            display: block;
+
+            margin: 9px 0 20px;
+
+            color: var(--sf-muted);
+
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* ==========================================
+       IMAGE UPLOAD — FEATURED AREA
+    ========================================== */
+
+        .share-food-page .image-label {
+            color: #2c5237;
+            font-weight: 750;
+        }
+
+        .share-food-page .image-upload-box {
+            position: relative;
+
+            margin-top: 12px;
+            padding: 28px 24px;
+
+            background:
+                radial-gradient(ellipse at 50% 0%,
+                    rgba(121, 192, 137, 0.13),
+                    transparent 70%),
+                linear-gradient(145deg, #f7fbf7, #f0f8f1);
+
+            border: 2px dashed #a9cfb2;
+            border-radius: 19px;
+
+            text-align: center;
+
+            transition:
+                border-color 0.3s ease,
+                background-color 0.3s ease,
+                box-shadow 0.3s ease;
+        }
+
+        .share-food-page .image-upload-box p {
+            margin: 0 0 18px;
+
+            color: #66776b;
+
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .share-food-page .image-upload-box input[type="file"] {
+            display: block;
+
+            width: 100%;
+            max-width: 100%;
+
+            margin: 0 auto;
+            padding: 10px;
+
+            color: #52645a;
+            background: rgba(255, 255, 255, 0.9);
+
+            border: 1px solid #dce8de;
+            border-radius: 12px;
+
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        .share-food-page .image-upload-box input[type="file"]::file-selector-button {
+            margin-right: 12px;
+            padding: 10px 15px;
+
+            color: #236b3a;
+            background: #e7f4e9;
+
+            border: 1px solid #d1e7d6;
+            border-radius: 9px;
+
+            font-size: 12px;
+            font-weight: 750;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .share-food-page .image-upload-box input[type="file"]::file-selector-button:hover {
+            background: #d5ecd9;
+            transform: translateY(-1px);
+        }
+
+        .share-food-page .image-upload-box:focus-within {
+            border-color: #4d9963;
+
+            box-shadow:
+                0 0 0 4px rgba(55, 143, 79, 0.07),
+                0 8px 24px rgba(35, 107, 58, 0.045);
+        }
+
+        .share-food-page #image-preview {
+            display: none;
+
+            width: 100%;
+            max-height: 320px;
+
+            margin-top: 20px;
+
+            object-fit: cover;
+
+            background: #edf5ef;
+            border: 1px solid #d9e7dc;
+            border-radius: 15px;
+
+            box-shadow: 0 8px 24px rgba(30, 57, 37, 0.10);
+
+            animation: sf-enter 0.3s ease both;
+        }
+
+        /* ==========================================
+       SUCCESS MESSAGES
+    ========================================== */
+
+        .share-food-page .success-message,
+        .share-food-page .publish-success {
+            padding: 16px 18px;
+            margin: 20px 0;
+
+            color: #236b3a;
+            background: linear-gradient(135deg, #edf8ef, #e3f3e6);
+
+            border: 1px solid #c4e4cc;
+            border-radius: 13px;
+
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.8;
+            text-align: center;
+
+            box-shadow: 0 4px 12px rgba(35, 107, 58, 0.04);
+        }
+
+        .share-food-page .publish-success {
+            margin-top: 22px;
+        }
+
+        /* ==========================================
+       SHOWSTOPPER PUBLISH BUTTON
+    ========================================== */
+
+        .share-food-page form button[type="submit"] {
+            position: relative;
+            isolation: isolate;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            min-height: 56px;
+
+            margin-top: 32px;
+            padding: 15px 22px;
+
+            overflow: hidden;
+
+            color: #ffffff;
+
+            background: linear-gradient(110deg,
+                    #174b2b,
+                    #236b3a 45%,
+                    #32854c);
+
+            border: 1px solid #236b3a;
+            border-radius: 13px;
+
+            box-shadow:
+                0 5px 12px rgba(35, 107, 58, 0.16),
+                0 12px 26px rgba(35, 107, 58, 0.09);
+
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 750;
+            line-height: 1.5;
+            letter-spacing: 0.15px;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                background 0.25s ease;
+        }
+
+        /* Moving shine */
+
+        .share-food-page form button[type="submit"]::before {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            left: -130%;
+
+            width: 70%;
+            height: 100%;
+
+            background: linear-gradient(110deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.19),
+                    transparent);
+
+            transform: skewX(-20deg);
+
+            transition: left 0.65s ease;
+
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .share-food-page form button[type="submit"]:hover {
+            background: linear-gradient(110deg,
+                    #236b3a,
+                    #2f8548,
+                    #3c9656);
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 8px 18px rgba(35, 107, 58, 0.20),
+                0 18px 32px rgba(35, 107, 58, 0.12);
+        }
+
+        .share-food-page form button[type="submit"]:hover::before {
+            left: 150%;
+        }
+
+        .share-food-page form button[type="submit"]:active {
+            transform: translateY(-1px);
+
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.15);
+        }
+
+        .share-food-page form button[type="submit"]:focus-visible {
+            outline: 3px solid #82b991;
+            outline-offset: 4px;
+        }
+
+        /* ==========================================
+       BACK TO DASHBOARD
+    ========================================== */
+
+        .share-food-page .login-card>p:last-child {
+            margin: 26px 0 0;
+            text-align: center;
+        }
+
+        .share-food-page .login-card>p:last-child a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 8px 12px;
+
+            color: #236b3a;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+            font-weight: 750;
+            text-decoration: none;
+
+            transition:
+                color 0.2s ease,
+                background-color 0.2s ease;
+        }
+
+        .share-food-page .login-card>p:last-child a:hover {
+            color: #174b2b;
+            background: #edf7ef;
+        }
+
+        /* ==========================================
+       TABLET
+    ========================================== */
+
+        @media (max-width: 1000px) {
+            .share-food-page {
+                padding: 30px 22px 45px;
+            }
+
+            .share-food-page .login-card {
+                padding: 34px;
+            }
+        }
+
+        /* ==========================================
+       MOBILE
+    ========================================== */
+
+        @media (max-width: 768px) {
+            .share-food-page {
+                margin-left: 200px;
+                padding: 24px 17px 35px;
+            }
+
+            .share-food-page .login-card {
+                padding: 28px;
+                border-radius: 22px;
+            }
+
+            .share-food-page .login-card>h2 {
+                font-size: 30px;
+            }
+
+            .share-food-page .sf-hero {
+                padding: 23px;
+                gap: 15px;
+            }
+
+            .share-food-page .sf-hero h2 {
+                font-size: 27px;
+            }
+
+            .share-food-page .sf-hero-art {
+                width: 78px;
+                height: 78px;
+                border-radius: 17px;
+            }
+
+            .share-food-page .sf-hero-art>span:first-child {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .share-food-page {
+                margin-left: 0;
+                padding: 16px 12px 28px;
+            }
+
+            .share-food-page .login-card {
+                padding: 25px 18px;
+                border-radius: 19px;
+            }
+
+            .share-food-page .login-card>h2 {
+                font-size: 28px;
+                letter-spacing: -0.6px;
+            }
+
+            .share-food-page form label {
+                margin-top: 20px;
+            }
+
+            .share-food-page .image-upload-box {
+                padding: 19px 12px;
+            }
+
+            .share-food-page .image-upload-box input[type="file"] {
+                font-size: 11px;
+            }
+
+            .share-food-page form button[type="submit"] {
+                min-height: 52px;
+            }
+
+            .share-food-page .sf-hero {
+                padding: 21px 18px;
+                border-radius: 17px;
+            }
+
+            .share-food-page .sf-hero h2 {
+                font-size: 25px;
+            }
+
+            .share-food-page .sf-hero-content p {
+                font-size: 12px;
+            }
+
+            .share-food-page .sf-hero-art {
+                display: none;
+            }
+        }
+
+        /* ==========================================
+       ACCESSIBILITY
+    ========================================== */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .share-food-page *,
+            .share-food-page *::before,
+            .share-food-page *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        .share-food-page .sf-hero .sf-hero-content h2 {
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="login-container share-food-page">
+
+        <div class="login-card">
+
+            <!-- PREMIUM SHARE FOOD BANNER -->
+            <section class="sf-hero">
+                <div class="sf-hero-content">
+                    <div class="sf-eyebrow">
+                        <span class="sf-eyebrow-dot"></span>
+                        SHARE FOOD
+                    </div>
+
+                    <h2>Share Surplus Food</h2>
+
+                    <p>
+                        Every meal deserves a purpose. Share your surplus food
+                        with nearby organisations and help make a difference
+                        with MealMatch.
+                    </p>
+                </div>
+
+                <div class="sf-hero-art" aria-hidden="true">
+                    <span>🍱</span>
+                    <span class="sf-art-leaf">✦</span>
+                </div>
+            </section>
+            {% if request.args.get('published') == 'success' %}
+            <div class="success-message">
+                ✓ Food listing published successfully!
+            </div>
+            {% endif %}
+
+            <p>Tell nearby organisations what food you have available.</p>
+
+            <form action="/share-food" method="POST" enctype="multipart/form-data">
+
+                <!-- Food Name -->
+                <label for="food_name">Food name</label>
+                <input type="text" id="food_name" name="food_name" class="food-form-input"
+                    placeholder="e.g. Vegetable meals" required>
+
+                <!-- Food Category -->
+                <label for="food_category">Food Category</label>
+                <select id="food_category" name="food_category" class="food-form-select" required>
+                    <option value="">Select food category</option>
+                    <option value="Indian">Indian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Snacks & Fast Food">Snacks &amp; Fast Food</option>
+                    <option value="Healthy Food">Healthy Food</option>
+                    <option value="Desserts & Sweets">Desserts &amp; Sweets</option>
+                    <option value="Bakery">Bakery</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <div id="custom-food-category-box" style="display: none;">
+                    <label for="custom_food_category">Enter the food category</label>
+                    <input type="text" id="custom_food_category" name="custom_food_category" class="food-form-input"
+                        placeholder="Type a food category" disabled>
+                </div>
+
+                <!-- Food Type -->
+                <label for="food_type">Food Type</label>
+                <select id="food_type" name="food_type" class="food-form-select" required>
+                    <option value="">Select food type</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                    <option value="Vegan">Vegan</option>
+                </select>
+
+                <!-- Price Per Meal -->
+                <label for="price">Price per Meal (₹)</label>
+                <input type="number" id="price" name="price" class="food-form-input" min="0" step="0.01"
+                    placeholder="e.g. 30 (enter 0 for free food)" value="0" required>
+
+                <small class="field-hint">
+                    Enter the price for one meal. Set it to ₹0 if the food is free.
+                </small>
+
+                <!-- Food Image -->
+                <label for="food_image" class="image-label">
+                    Upload Food Image 📸
+                </label>
+
+                <div class="image-upload-box">
+                    <p>Choose a photo of the actual food you're sharing.</p>
+
+                    <input type="file" id="food_image" name="food_image" accept="image/png,image/jpeg,image/webp">
+
+                    <img id="image-preview" alt="Preview of selected food">
+                </div>
+
+                <!-- Quantity -->
+                <label for="quantity">Quantity (number of meals)</label>
+                <input type="number" id="quantity" name="quantity" class="food-form-input" min="1" placeholder="e.g. 50"
+                    required>
+
+                <!-- Pickup Location -->
+                <label for="location">Pickup location</label>
+                <input type="text" id="location" name="location" class="food-form-input"
+                    placeholder="Enter pickup address or area" required>
+
+                <!-- Availability -->
+                <label for="available_until">Available until</label>
+                <input type="datetime-local" id="available_until" name="available_until" class="food-form-input"
+                    required>
+
+                <button type="submit">Publish Food Listing</button>
+
+            </form>
+
+
+            {% if request.args.get('published') == 'success' %}
+            <div class="publish-success">
+                ✅ Food published successfully!
+            </div>
+            {% endif %}
+
+
+            <p><a href="/dashboard">Back to Dashboard</a></p>
+
+        </div>
+
+    </main>
+
+    <script>
+        const imageInput = document.getElementById("food_image");
+        const imagePreview = document.getElementById("image-preview");
+
+        let previewUrl = null;
+
+        imageInput.addEventListener("change", function () {
+            const file = this.files[0];
+
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                previewUrl = null;
+            }
+
+            if (!file) {
+                imagePreview.style.display = "none";
+                imagePreview.removeAttribute("src");
+                return;
+            }
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                alert("Please select a JPG, PNG, or WebP image.");
+                this.value = "";
+                imagePreview.style.display = "none";
+                imagePreview.removeAttribute("src");
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Please choose an image smaller than 5 MB.");
+                this.value = "";
+                imagePreview.style.display = "none";
+                imagePreview.removeAttribute("src");
+                return;
+            }
+
+            previewUrl = URL.createObjectURL(file);
+            imagePreview.src = previewUrl;
+            imagePreview.style.display = "block";
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const categorySelect = document.getElementById("food_category");
+            const customBox = document.getElementById("custom-food-category-box");
+            const customInput = document.getElementById("custom_food_category");
+
+            function updateCategoryField() {
+                const isOther = categorySelect.value === "Other";
+
+                customBox.style.display = isOther ? "block" : "none";
+                customInput.disabled = !isOther;
+                customInput.required = isOther;
+
+                if (isOther) {
+                    categorySelect.name = "category_choice";
+                    customInput.focus();
+                } else {
+                    categorySelect.name = "food_category";
+                    customInput.value = "";
+                }
+            }
+
+            categorySelect.addEventListener("change", updateCategoryField);
+            updateCategoryField();
+        });
+    </script>
+
+</body>
+
+</html>

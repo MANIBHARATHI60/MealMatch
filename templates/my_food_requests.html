@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Food Requests | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f6f3;
+            color: #26352b;
+        }
+
+        .requests-page {
+            margin-left: 250px;
+            padding: 35px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .requests-header {
+            margin-bottom: 28px;
+        }
+
+        .requests-header h1 {
+            margin: 0 0 10px;
+            color: #236B3A;
+            font-size: 34px;
+        }
+
+        .requests-header p {
+            margin: 0;
+            color: #68756b;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .requests-list {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 22px;
+            align-items: start;
+            width: 100%;
+        }
+
+        .request-card {
+            min-width: 0;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e2ebe3;
+            border-radius: 15px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.055);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .request-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.09);
+        }
+
+        .food-image-container {
+            width: 100%;
+            height: 175px;
+            overflow: hidden;
+            background: #e8f5ed;
+        }
+
+        .food-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: #68756b;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        .no-image span {
+            font-size: 45px;
+        }
+
+        .request-details {
+            padding: 20px;
+            min-width: 0;
+        }
+
+        .request-details h2 {
+            margin: 0 0 17px;
+            color: #236B3A;
+            font-size: 23px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .request-details p {
+            margin: 11px 0;
+            color: #59665d;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .request-details strong {
+            color: #35483A;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 11px;
+            border-radius: 20px;
+            background: #e8f5ed;
+            color: #236B3A;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        /* BUTTONS */
+
+        .chat-button,
+        .confirm-received-button,
+        .cancel-received-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: 100%;
+            min-height: 43px;
+            margin-top: 10px;
+            padding: 11px 14px;
+            box-sizing: border-box;
+            border: 1px solid #236B3A;
+            border-radius: 9px;
+            background: #236B3A;
+            color: #ffffff !important;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition:
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .chat-button:hover,
+        .confirm-received-button:hover {
+            background: #194f2b;
+            border-color: #194f2b;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.17);
+            transform: translateY(-2px);
+        }
+
+        .chat-button:active,
+        .confirm-received-button:active {
+            transform: translateY(0);
+        }
+
+        /* CANCEL BUTTON */
+
+        .cancel-received-button {
+            background: #236B3A;
+            color: #ffffff !important;
+            border-color: #236B3A;
+        }
+
+        .cancel-received-button:hover {
+            background: #184f2b;
+            color: #ffffff !important;
+            border-color: #184f2b;
+            transform: translateY(-2px);
+        }
+
+        /* STATUS MESSAGES */
+
+        .handover-message,
+        .accepted-message {
+            padding: 12px;
+            border: 1px solid #d8eadb;
+            border-radius: 9px;
+            background: #edf7ef;
+            color: #236B3A !important;
+            line-height: 1.6;
+        }
+
+        /* RECEIPT CONFIRMATION */
+
+        .received-confirm-control {
+            margin-top: 12px;
+        }
+
+        .received-confirmation {
+            margin-top: 14px;
+            padding: 15px;
+            border: 1px solid #dce8dd;
+            border-radius: 10px;
+            background: #f7faf7;
+        }
+
+        .received-confirmation[hidden] {
+            display: none !important;
+        }
+
+        .received-confirmation p {
+            margin-top: 0;
+        }
+
+        .received-confirmation-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .received-confirmation-actions form {
+            width: 100%;
+        }
+
+        .received-confirmation-actions .confirm-received-button,
+        .received-confirmation-actions .cancel-received-button {
+            margin-top: 0;
+        }
+
+        /* SUBMITTED REVIEW */
+
+        .submitted-review {
+            margin-top: 16px;
+            padding: 15px;
+            border: 1px solid #e1e9df;
+            border-radius: 10px;
+            background: #f7faf7;
+        }
+
+        .submitted-review h3 {
+            margin: 0 0 12px;
+            color: #236B3A;
+            font-size: 17px;
+        }
+
+        .submitted-stars {
+            color: #d49b16 !important;
+            font-size: 20px !important;
+        }
+
+        .submitted-stars strong {
+            color: #35483A;
+            font-size: 14px;
+        }
+
+        .review-locked {
+            color: #236B3A !important;
+            font-size: 12px !important;
+        }
+
+        /* EMPTY STATE */
+
+        .empty-requests {
+            padding: 45px 25px;
+            border: 1px dashed #b9d9c4;
+            border-radius: 15px;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .empty-requests h2 {
+            margin-top: 0;
+            color: #236B3A;
+        }
+
+        .empty-requests p {
+            color: #68756b;
+            line-height: 1.7;
+        }
+
+        .empty-requests .chat-button {
+            max-width: 240px;
+        }
+
+        /* MEDIUM SCREENS */
+
+        @media (max-width: 1200px) {
+            .requests-page {
+                padding: 25px;
+            }
+
+            .requests-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px;
+            }
+        }
+
+        /* SMALL SCREENS */
+
+        @media (max-width: 768px) {
+            .requests-page {
+                margin-left: 200px;
+                padding: 18px;
+            }
+
+            .requests-header h1 {
+                font-size: 27px;
+            }
+
+            .requests-header p {
+                font-size: 14px;
+            }
+
+            .requests-list {
+                grid-template-columns: 1fr;
+            }
+
+            .food-image-container {
+                height: 190px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .requests-page {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .request-details {
+                padding: 15px;
+            }
+
+            .request-details h2 {
+                font-size: 21px;
+            }
+        }
+
+        /* KEYBOARD ACCESSIBILITY */
+
+        .chat-button:focus-visible,
+        .confirm-received-button:focus-visible,
+        .cancel-received-button:focus-visible {
+            outline: 2px solid #236B3A;
+            outline-offset: 3px;
+        }
+
+        /* REDUCED MOTION */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .request-card,
+            .chat-button,
+            .confirm-received-button,
+            .cancel-received-button {
+                transition: none;
+            }
+
+            .request-card:hover,
+            .chat-button:hover,
+            .confirm-received-button:hover,
+            .cancel-received-button:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <!-- RECEIPT CONFIRMATION MACRO -->
+
+    {% macro receipt_confirmation(item) %}
+
+    <p class="handover-message">
+        The provider has marked the food handover as completed.
+        Please confirm that you received the food.
+    </p>
+
+    <div class="received-confirm-control">
+
+        <button type="button" class="chat-button js-received-start">
+            Confirm Food Received ✓
+        </button>
+
+        <div class="received-confirmation" hidden>
+
+            <p>
+                <strong>Have you received the food?</strong>
+                <br>
+                Confirm only after you have received the food
+                from the provider.
+            </p>
+
+            <div class="received-confirmation-actions">
+
+                <form action="{{ url_for('confirm_food_received', request_id=item.request_id) }}" method="POST">
+                    <button type="submit" class="confirm-received-button">
+                        Yes, confirm received
+                    </button>
+                </form>
+
+                <button type="button" class="cancel-received-button">
+                    Cancel
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    {% endmacro %}
+
+
+    <main class="requests-page">
+
+        <header class="requests-header">
+            <h1>My Food Requests 🍱</h1>
+
+            <p>
+                Track your food requests, manage quantity proposals,
+                coordinate pickups, and review providers.
+            </p>
+        </header>
+
+
+        {% if requests_list %}
+
+        <section class="requests-list" id="foodRequests">
+
+            {% for item in requests_list %}
+
+            <article class="request-card" id="request-{{ item.request_id }}">
+
+                <!-- FOOD IMAGE -->
+
+                <div class="food-image-container">
+
+                    {% if item.image_filename %}
+
+                    <img class="food-image" src="{{ url_for('static', filename='uploads/' ~ item.image_filename) }}"
+                        alt="{{ item.food_name }}" loading="lazy">
+
+                    {% else %}
+
+                    <div class="no-image">
+                        <span>🍱</span>
+                        <div>No image available</div>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="request-details">
+
+                    <h2>{{ item.food_name }}</h2>
+
+                    <p>
+                        <strong>Provider:</strong>
+                        {{ item.provider_name }}
+                    </p>
+
+                    <p>
+                        <strong>Food Quantity:</strong>
+                        {{ item.quantity }}
+                    </p>
+
+                    {% if item.proposed_quantity %}
+                    <p>
+                        <strong>Your Proposed Quantity:</strong>
+                        {{ item.proposed_quantity }}
+                    </p>
+                    {% endif %}
+
+                    <p>
+                        <strong>Pickup Location:</strong>
+                        {{ item.location }}
+                    </p>
+
+                    <p>
+                        <strong>Request Date:</strong>
+                        {{ item.created_at }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="status">
+                            {{ item.request_status }}
+                        </span>
+                    </p>
+
+
+                    <!-- COMPLETED REQUEST -->
+                    <!-- Completed requests never show receipt confirmation again. -->
+
+                    {% if item.request_status == 'completed' %}
+
+                    <p class="handover-message">
+                        Food received and confirmed! ✓
+                    </p>
+                    <a href="{{ url_for('meal_match_feedback', request_id=item.request_id) }}" class="chat-button">
+                        Give Feedback About MealMatch ⭐
+                    </a>
+                    {% if item.review_id %}
+
+                    <div class="submitted-review">
+
+                        <h3>Your Rating</h3>
+
+                        <p class="submitted-stars">
+
+                            {% for star in range(1, 6) %}
+                            {% if item.my_rating and star <= item.my_rating %} ★ {% else %} ☆ {% endif %} {% endfor %}
+                                <strong>{{ item.my_rating }}/5</strong>
+
+                        </p>
+
+                        <p>
+                            <strong>Your Review:</strong>
+                            {{ item.my_review or 'No written comment provided.' }}
+                        </p>
+
+                        <p class="review-locked">
+                            ✓ Your review has been submitted
+                            and cannot be edited.
+                        </p>
+
+                    </div>
+
+                    {% else %}
+
+                    <a href="{{ url_for('rate_provider', request_id=item.request_id) }}" class="chat-button">
+                        Rate Provider ⭐
+                    </a>
+
+                    {% endif %}
+
+                    <a href="{{ url_for('view_provider_reviews', provider_id=item.provider_id) }}" class="chat-button">
+                        View Provider Reviews 💬
+                    </a>
+
+                    {% elif item.handover_completed and not item.receiver_confirmed and item.request_status in
+                    ['accepted', 'confirmed'] %}
+
+                    {{ receipt_confirmation(item) }}
+
+
+                    <!-- CANCELLED REQUEST: DISPLAY THE REASON -->
+
+                    {% elif item.request_status|lower == 'cancelled' %}
+
+                    {% if item.cancellation_reason == 'provider_timeout' %}
+
+                    <p class="handover-message">
+                        ⏰ This request was cancelled because the provider
+                        did not respond to your proposed quantity before
+                        the deadline.
+                    </p>
+
+                    {% elif item.cancellation_reason == 'receiver_timeout' %}
+
+                    <p class="handover-message">
+                        ⏰ This request was cancelled because you did not
+                        confirm the arrangement before the deadline.
+                    </p>
+
+                    {% else %}
+
+                    <p class="handover-message">
+                        This request was cancelled.
+                    </p>
+
+                    {% endif %}
+
+
+                    <!-- REQUEST CANCELLED -->
+                    {% elif item.request_status|lower == 'cancelled' %}
+
+                    <p class="handover-message">
+                        {% if item.cancellation_reason == 'provider_timeout' %}
+                        ⏰ This request was cancelled because the provider did not respond before the confirmation
+                        deadline.
+                        {% elif item.cancellation_reason == 'receiver_timeout' %}
+                        ⏰ This request was cancelled because you did not confirm the arrangement before the deadline.
+                        {% else %}
+                        ❌ This request was cancelled. The food request is no longer active.
+                        {% endif %}
+                    </p>
+
+
+                    <!-- QUANTITY PROPOSAL PENDING -->
+                    {% elif item.quantity_proposal_status == 'pending' %}
+
+                    <p class="handover-message">
+                        🤖 Your proposed quantity is
+                        <strong>{{ item.proposed_quantity }}</strong>.
+                        Waiting for the provider to respond.
+                    </p>
+
+
+
+
+                    <!-- PROVIDER ACCEPTED THE PROPOSAL -->
+
+                    {% elif item.quantity_proposal_status == 'accepted'
+                    and not item.arrangement_confirmed
+                    and item.request_status == 'accepted' %}
+
+                    <p class="accepted-message">
+                        ✓ The provider accepted your proposed quantity:
+                        <strong>{{ item.proposed_quantity }}</strong>.
+                    </p>
+
+                    <p>
+                        Please confirm the arrangement to proceed.
+                    </p>
+
+                    <form action="{{ url_for('confirm_arrangement', request_id=item.request_id) }}" method="POST">
+                        <button type="submit" class="chat-button">
+                            Confirm Arrangement ✓
+                        </button>
+                    </form>
+
+
+                    <!-- PROVIDER REJECTED THE PROPOSAL -->
+
+                    {% elif item.quantity_proposal_status == 'rejected' %}
+
+                    <p class="handover-message">
+                        The provider couldn't accept your proposed quantity.
+                        You can explore other food listings.
+                    </p>
+
+
+                    <!-- ACCEPTED NORMAL REQUEST -->
+
+                    {% elif item.request_status == 'accepted' %}
+
+                    {% if item.handover_completed and not item.receiver_confirmed %}
+
+                    {{ receipt_confirmation(item) }}
+
+                    {% else %}
+
+                    <p class="accepted-message">
+                        Your food request has been accepted!
+                    </p>
+
+                    <a href="{{ url_for('open_chat', request_id=item.request_id) }}" class="chat-button">
+                        Open Chat 💬
+                    </a>
+
+                    {% endif %}
+
+
+
+                    <!-- PENDING NORMAL REQUEST -->
+                    {% elif item.request_status == 'pending' %}
+
+                    {% if item.confirmation_deadline and item.quantity_proposal_status != 'accepted' %}
+
+                    <p class="accepted-message">
+                        ✓ The provider has accepted your request!
+                    </p>
+
+                    <p>
+                        Please accept the chat and arrangement within 5 minutes.
+                    </p>
+
+                    <form action="{{ url_for('accept_chat_arrangement', request_id=item.request_id) }}" method="POST">
+                        <button type="submit" class="chat-button">
+                            Accept Chat & Arrangement 💬
+                        </button>
+                    </form>
+
+                    {% else %}
+
+                    <p>
+                        Waiting for the provider to respond to your request.
+                    </p>
+
+                    {% endif %}
+
+
+                    <!-- CONFIRMED ARRANGEMENT -->
+
+                    {% elif item.request_status == 'confirmed' %}
+
+                    {% if item.handover_completed and not item.receiver_confirmed %}
+
+                    {{ receipt_confirmation(item) }}
+
+                    {% else %}
+
+                    <p class="accepted-message">
+                        Your arrangement is confirmed! ✓
+                    </p>
+
+                    <a href="{{ url_for('open_chat', request_id=item.request_id) }}" class="chat-button">
+                        Open Chat 💬
+                    </a>
+
+                    {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        {% else %}
+
+        <section class="empty-requests">
+
+            <h2>No Food Requests Yet 🍽️</h2>
+
+            <p>
+                You haven't requested any food yet.
+                Browse available food listings to get started!
+            </p>
+
+            <a href="{{ url_for('browse_food') }}" class="chat-button">
+                Browse Food 🍱
+            </a>
+
+        </section>
+
+        {% endif %}
+
+    </main>
+
+
+    <script>
+        document.addEventListener("click", function (event) {
+
+            const startButton = event.target.closest(
+                ".js-received-start"
+            );
+
+            const cancelButton = event.target.closest(
+                ".cancel-received-button"
+            );
+
+            if (startButton) {
+
+                const container = startButton.closest(
+                    ".received-confirm-control"
+                );
+
+                if (!container) {
+                    return;
+                }
+
+                const confirmation = container.querySelector(
+                    ".received-confirmation"
+                );
+
+                if (confirmation) {
+                    confirmation.hidden = false;
+                    startButton.hidden = true;
+                }
+            }
+
+            if (cancelButton) {
+
+                const container = cancelButton.closest(
+                    ".received-confirm-control"
+                );
+
+                if (!container) {
+                    return;
+                }
+
+                const confirmation = container.querySelector(
+                    ".received-confirmation"
+                );
+
+                const start = container.querySelector(
+                    ".js-received-start"
+                );
+
+                if (confirmation) {
+                    confirmation.hidden = true;
+                }
+
+                if (start) {
+                    start.hidden = false;
+                }
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>

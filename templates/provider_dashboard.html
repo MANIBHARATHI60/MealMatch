@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Food Provider Dashboard | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .provider-dashboard {
+            --pd-green: #236b3a;
+            --pd-green-dark: #184f2b;
+            --pd-green-light: #eaf5ed;
+            --pd-text: #24362a;
+            --pd-muted: #68766c;
+            --pd-border: #e5ece6;
+
+            max-width: 1500px;
+            margin-left: 250px;
+            padding: 32px;
+            box-sizing: border-box;
+            min-height: 100vh;
+            color: var(--pd-text);
+            font-family: Arial, sans-serif;
+        }
+
+        .provider-dashboard *,
+        .provider-dashboard *::before,
+        .provider-dashboard *::after {
+            box-sizing: border-box;
+        }
+
+        /* =========================================
+   PREMIUM PROVIDER DASHBOARD HERO BANNER
+========================================= */
+
+        .provider-dashboard .pd-hero {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+
+            padding: 42px;
+            margin-bottom: 32px;
+
+            background:
+                radial-gradient(circle at 78% 15%,
+                    rgba(151, 224, 166, 0.20),
+                    transparent 32%),
+                linear-gradient(120deg,
+                    #174f2b 0%,
+                    #236b3a 52%,
+                    #398751 100%);
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 25px;
+
+            box-shadow: 0 12px 32px rgba(35, 107, 58, 0.17);
+
+            overflow: hidden;
+            isolation: isolate;
+
+            animation: pdBannerEntrance 0.7s ease both;
+
+            transition:
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+        }
+
+
+        /* DECORATIVE BACKGROUND CIRCLES */
+
+        .provider-dashboard .pd-hero::before {
+            content: "";
+
+            position: absolute;
+            z-index: -1;
+
+            width: 330px;
+            height: 330px;
+
+            top: -210px;
+            right: 100px;
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 0 25px rgba(255, 255, 255, 0.025),
+                0 0 0 55px rgba(255, 255, 255, 0.02);
+
+            pointer-events: none;
+
+            transition:
+                transform 0.6s ease,
+                border-color 0.35s ease;
+        }
+
+
+        .provider-dashboard .pd-hero::after {
+            content: "";
+
+            position: absolute;
+            z-index: -1;
+
+            width: 210px;
+            height: 210px;
+
+            right: -75px;
+            bottom: -130px;
+
+            border: 32px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+
+            pointer-events: none;
+
+            transition: transform 0.6s ease;
+        }
+
+
+        /* BANNER CONTENT */
+
+        .provider-dashboard .pd-hero-content {
+            position: relative;
+            z-index: 2;
+
+            flex: 1;
+            max-width: 650px;
+            min-width: 0;
+        }
+
+
+        /* GLASS-EFFECT EYEBROW BADGE */
+
+        .provider-dashboard .pd-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 9px 14px;
+            margin-bottom: 20px;
+
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 30px;
+
+            color: #e6f7e9;
+
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+
+            backdrop-filter: blur(8px);
+
+            transition:
+                background-color 0.3s ease,
+                border-color 0.3s ease,
+                transform 0.3s ease;
+        }
+
+
+        /* ANIMATED STATUS DOT */
+
+        .provider-dashboard .pd-eyebrow-dot {
+            position: relative;
+
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+
+            background: #a8f0b7;
+            border-radius: 50%;
+
+            box-shadow: 0 0 10px rgba(168, 240, 183, 0.65);
+        }
+
+        .provider-dashboard .pd-eyebrow-dot::after {
+            content: "";
+
+            position: absolute;
+            inset: -4px;
+
+            border: 1px solid rgba(168, 240, 183, 0.55);
+            border-radius: 50%;
+
+            animation: pdDotPulse 2s ease-out infinite;
+        }
+
+
+        /* WELCOME HEADING */
+
+        .provider-dashboard .pd-hero h1 {
+            margin: 0 0 16px;
+
+            color: #ffffff;
+
+            font-size: clamp(29px, 3vw, 42px);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -1.1px;
+
+            overflow-wrap: anywhere;
+        }
+
+
+        /* WELCOME DESCRIPTION */
+
+        .provider-dashboard .pd-hero-description {
+            max-width: 560px;
+
+            margin: 0;
+
+            color: #e0f0e4;
+
+            font-size: 15px;
+            line-height: 1.9;
+        }
+
+
+        /* FOOD IMAGE FRAME */
+
+        .provider-dashboard .pd-hero-art {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            width: 205px;
+            height: 165px;
+
+            padding: 7px;
+
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.30);
+            border-radius: 23px;
+
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+
+            backdrop-filter: blur(8px);
+
+            transform: rotate(4deg);
+
+            transition:
+                transform 0.4s ease,
+                box-shadow 0.4s ease,
+                background-color 0.4s ease,
+                border-color 0.4s ease;
+        }
+
+
+        /* FOOD IMAGE */
+
+        .provider-dashboard .pd-hero-art img {
+            display: block;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            border-radius: 17px;
+
+            transition:
+                transform 0.45s ease,
+                filter 0.45s ease;
+        }
+
+
+        /* =========================================
+   BANNER HOVER EFFECTS
+========================================= */
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .provider-dashboard .pd-hero:hover {
+                box-shadow: 0 17px 38px rgba(35, 107, 58, 0.23);
+            }
+
+            .provider-dashboard .pd-hero:hover::before {
+                transform: translate(-12px, 12px) scale(1.06);
+                border-color: rgba(255, 255, 255, 0.22);
+            }
+
+            .provider-dashboard .pd-hero:hover::after {
+                transform: translate(-12px, -12px);
+            }
+
+            .provider-dashboard .pd-hero:hover .pd-eyebrow {
+                background: rgba(255, 255, 255, 0.18);
+                border-color: rgba(255, 255, 255, 0.32);
+                transform: translateY(-2px);
+            }
+
+            .provider-dashboard .pd-hero:hover .pd-hero-art {
+                transform: rotate(0deg) translateY(-5px) scale(1.035);
+
+                background: rgba(255, 255, 255, 0.22);
+                border-color: rgba(255, 255, 255, 0.45);
+
+                box-shadow: 0 18px 36px rgba(0, 0, 0, 0.20);
+            }
+
+            .provider-dashboard .pd-hero:hover .pd-hero-art img {
+                transform: scale(1.035);
+                filter: saturate(1.08);
+            }
+        }
+
+
+        /* =========================================
+   BANNER ANIMATIONS
+========================================= */
+
+        @keyframes pdBannerEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        @keyframes pdDotPulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        /* SECTION HEADING */
+
+        .provider-dashboard .pd-section-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0 0 19px;
+        }
+
+        .provider-dashboard .pd-section-heading h2 {
+            margin: 0 0 5px;
+            color: var(--pd-text);
+            font-size: 23px;
+        }
+
+        .provider-dashboard .pd-section-heading p {
+            margin: 0;
+            color: var(--pd-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* DASHBOARD GRID */
+
+        .provider-dashboard .pd-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        /* =====================================
+   PREMIUM DASHBOARD CARDS
+===================================== */
+
+        .provider-dashboard .pd-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            min-width: 0;
+            padding: 28px;
+
+            background: linear-gradient(145deg,
+                    #ffffff 0%,
+                    #fcfefc 100%);
+
+            border: 1px solid #e1ebe3;
+            border-radius: 22px;
+
+            box-shadow:
+                0 3px 8px rgba(30, 57, 37, 0.025),
+                0 8px 22px rgba(30, 57, 37, 0.045);
+
+            overflow: hidden;
+
+            transition:
+                transform 0.28s ease,
+                box-shadow 0.28s ease,
+                border-color 0.28s ease,
+                background 0.28s ease;
+        }
+
+        /* Subtle green accent at the top */
+
+        .provider-dashboard .pd-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 4px;
+
+            background: linear-gradient(90deg,
+                    #236b3a,
+                    #83c994);
+
+            transform: scaleX(0);
+            transform-origin: left;
+
+            transition: transform 0.28s ease;
+        }
+
+        /* Card icon container */
+
+        .provider-dashboard .pd-card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 58px;
+            height: 58px;
+
+            margin-bottom: 22px;
+
+            color: #236b3a;
+            background: linear-gradient(145deg,
+                    #edf8ef,
+                    #e1f1e5);
+
+            border: 1px solid #d8eadc;
+            border-radius: 17px;
+
+            transition:
+                transform 0.28s ease,
+                background 0.28s ease,
+                box-shadow 0.28s ease;
+        }
+
+        .provider-dashboard .pd-card-icon svg {
+            width: 27px;
+            height: 27px;
+            stroke: currentColor;
+
+            transition: transform 0.28s ease;
+        }
+
+        /* Card heading */
+
+        .provider-dashboard .pd-card h3 {
+            margin: 0 0 11px;
+
+            color: #24362a;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.4;
+
+            transition: color 0.25s ease;
+        }
+
+        /* Card description */
+
+        .provider-dashboard .pd-card-description {
+            flex-grow: 1;
+
+            margin: 0 0 24px;
+
+            color: #68766c;
+            font-size: 14px;
+            line-height: 1.85;
+        }
+
+        /* BUTTONS */
+
+        .provider-dashboard .pd-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 47px;
+            max-width: 100%;
+            padding: 12px 18px;
+            background: var(--pd-green);
+            color: #ffffff !important;
+            border: 1px solid var(--pd-green);
+            border-radius: 10px;
+            box-shadow: 0 3px 7px rgba(35, 107, 58, 0.10);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            text-align: center;
+            text-decoration: none;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+            transition:
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .provider-dashboard .pd-button svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+            stroke: currentColor;
+            transition: transform 0.2s ease;
+        }
+
+        .provider-dashboard .pd-button:hover {
+            background: var(--pd-green-dark);
+            border-color: var(--pd-green-dark);
+            color: #ffffff !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 14px rgba(35, 107, 58, 0.18);
+        }
+
+        .provider-dashboard .pd-button:hover svg {
+            transform: translateX(3px);
+        }
+
+        .provider-dashboard .pd-button:focus-visible,
+        .provider-dashboard .pd-logout:focus-visible {
+            outline: 3px solid #82b991;
+            outline-offset: 3px;
+        }
+
+        /* AI AGENT CARD */
+
+        .provider-dashboard .pd-ai-card {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse at 100% 0%,
+                    rgba(180, 158, 246, 0.15),
+                    transparent 42%),
+                linear-gradient(135deg, #ffffff, #f8f5ff);
+            border-color: #e6ddfb;
+        }
+
+        .provider-dashboard .pd-ai-card .pd-card-icon {
+            color: #7350b5;
+            background: #eee7ff;
+            border-color: #e2d6ff;
+        }
+
+        .provider-dashboard .pd-ai-card h3 {
+            color: #6544a1;
+        }
+
+        .provider-dashboard .pd-ai-card .pd-button {
+            background: #7450b5;
+            border-color: #7450b5;
+        }
+
+        .provider-dashboard .pd-ai-card .pd-button:hover {
+            background: #5e3d98;
+            border-color: #5e3d98;
+            box-shadow: 0 6px 14px rgba(116, 80, 181, 0.2);
+        }
+
+        .provider-dashboard .pd-ai-label {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 6px 10px;
+            color: #6544a1;
+            background: #eee7ff;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+        }
+
+        .provider-dashboard .pd-ai-message {
+            width: 100%;
+            margin: 16px 0 0;
+            padding: 13px 15px;
+            color: #6544a1;
+            background: #eee7ff;
+            border: 1px solid #e0d3ff;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .provider-dashboard .pd-ai-message[hidden] {
+            display: none;
+        }
+
+        /* FOOTER AND LOGOUT */
+
+        .provider-dashboard .pd-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            padding-bottom: 10px;
+        }
+
+        .provider-dashboard .pd-logout {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 44px;
+            padding: 12px 22px;
+            color: #ffffff !important;
+            background: #d64545;
+            border: 1px solid #d64545;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition:
+                background-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .provider-dashboard .pd-logout svg {
+            width: 17px;
+            height: 17px;
+            stroke: currentColor;
+        }
+
+        .provider-dashboard .pd-logout:hover {
+            background: #b83232;
+            border-color: #b83232;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(214, 69, 69, 0.18);
+        }
+
+        /* =====================================
+           PREMIUM CARD HOVER EFFECTS
+        ===================================== */
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .provider-dashboard .pd-card:hover {
+                transform: translateY(-6px);
+
+                border-color: #bcd9c3;
+
+                background: #ffffff;
+
+                box-shadow:
+                    0 8px 18px rgba(30, 57, 37, 0.045),
+                    0 20px 38px rgba(35, 107, 58, 0.10);
+            }
+
+            .provider-dashboard .pd-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .provider-dashboard .pd-card:hover .pd-card-icon {
+                transform: translateY(-3px);
+
+                background: #e1f2e5;
+
+                box-shadow:
+                    0 5px 12px rgba(35, 107, 58, 0.09);
+            }
+
+            .provider-dashboard .pd-card:hover .pd-card-icon svg {
+                transform: scale(1.08);
+            }
+
+            .provider-dashboard .pd-card:hover h3 {
+                color: #236b3a;
+            }
+
+            /* AI AGENT CARD HOVER */
+
+            .provider-dashboard .pd-ai-card:hover {
+                border-color: #d2c1f2;
+
+                box-shadow:
+                    0 8px 18px rgba(70, 45, 110, 0.04),
+                    0 20px 38px rgba(116, 80, 181, 0.12);
+            }
+
+            .provider-dashboard .pd-ai-card:hover::before {
+                background: linear-gradient(90deg,
+                        #7450b5,
+                        #b9a0ef);
+            }
+
+            .provider-dashboard .pd-ai-card:hover .pd-card-icon {
+                background: #e8ddff;
+
+                box-shadow:
+                    0 5px 12px rgba(116, 80, 181, 0.10);
+            }
+
+            .provider-dashboard .pd-ai-card:hover h3 {
+                color: #6544a1;
+            }
+        }
+
+        /* TABLET */
+
+        @media (max-width: 1000px) {
+            .provider-dashboard {
+                padding: 25px;
+            }
+
+            .provider-dashboard .pd-hero {
+                padding: 30px;
+            }
+
+            .provider-dashboard .pd-hero-art {
+                width: 125px;
+                height: 125px;
+            }
+
+            .provider-dashboard .pd-hero-art svg {
+                width: 70px;
+                height: 70px;
+            }
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 768px) {
+            .provider-dashboard {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .provider-dashboard .pd-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .provider-dashboard .pd-hero {
+                padding: 25px;
+            }
+
+            .provider-dashboard .pd-hero h1 {
+                font-size: 28px;
+            }
+
+            .provider-dashboard .pd-hero-art {
+                width: 90px;
+                height: 90px;
+            }
+
+            .provider-dashboard .pd-hero-art svg {
+                width: 52px;
+                height: 52px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .provider-dashboard {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .provider-dashboard .pd-hero {
+                padding: 22px;
+                border-radius: 18px;
+            }
+
+            .provider-dashboard .pd-hero-art {
+                display: none;
+            }
+
+            .provider-dashboard .pd-section-heading h2 {
+                font-size: 21px;
+            }
+
+            .provider-dashboard .pd-card {
+                padding: 21px;
+            }
+
+            .provider-dashboard .pd-button {
+                width: 100%;
+            }
+        }
+
+        /* =========================================
+   RESPONSIVE HERO BANNER
+========================================= */
+
+        @media (max-width: 1000px) {
+
+            .provider-dashboard .pd-hero {
+                padding: 30px;
+                gap: 22px;
+            }
+
+            .provider-dashboard .pd-hero-art {
+                width: 145px;
+                height: 125px;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+
+            .provider-dashboard .pd-hero {
+                padding: 25px;
+                gap: 16px;
+            }
+
+            .provider-dashboard .pd-hero h1 {
+                font-size: 28px;
+            }
+
+            .provider-dashboard .pd-hero-art {
+                width: 105px;
+                height: 100px;
+                border-radius: 17px;
+            }
+
+            .provider-dashboard .pd-hero-art img {
+                border-radius: 12px;
+            }
+
+            .provider-dashboard .pd-hero-description {
+                font-size: 14px;
+            }
+        }
+
+
+        @media (max-width: 500px) {
+
+            .provider-dashboard .pd-hero {
+                padding: 22px;
+                border-radius: 19px;
+            }
+
+            .provider-dashboard .pd-hero-art {
+                display: none;
+            }
+
+            .provider-dashboard .pd-hero h1 {
+                font-size: 27px;
+            }
+
+            .provider-dashboard .pd-eyebrow {
+                font-size: 10px;
+                letter-spacing: 1px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .provider-dashboard *,
+            .provider-dashboard *::before,
+            .provider-dashboard *::after {
+                transition: none !important;
+                animation: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="provider-dashboard">
+
+        <!-- =====================================
+     PREMIUM PROVIDER WELCOME BANNER
+====================================== -->
+
+        <section class="pd-hero">
+
+            <div class="pd-hero-content">
+
+                <div class="pd-eyebrow">
+                    <span class="pd-eyebrow-dot"></span>
+                    PROVIDER DASHBOARD
+                </div>
+
+                <h1>
+                    Welcome, {{ session.get('name', 'Food Provider') }}! 👋
+                </h1>
+
+                <p class="pd-hero-description">
+                    Every meal deserves a purpose. Manage your surplus food,
+                    connect with Receivers, and make a meaningful difference
+                    with MealMatch.
+                </p>
+
+            </div>
+
+            <div class="pd-hero-art">
+
+                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=85"
+                    alt="Freshly prepared food ready to be shared" loading="eager">
+
+            </div>
+
+        </section>
+
+
+        <section aria-labelledby="pd-section-title">
+
+            <div class="pd-section-heading">
+                <div>
+                    <h2 id="pd-section-title">Your Workspace</h2>
+                    <p>Everything you need to share food and manage requests.</p>
+                </div>
+            </div>
+
+
+            <div class="pd-grid">
+
+                <!-- SHARE FOOD -->
+
+                <article class="pd-card">
+
+                    <div class="pd-card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M4 10h16l-1.5 10h-13L4 10Z" />
+                            <path d="M3 10h18" />
+                            <path d="M7 7c0-2 2-2 2-4" />
+                            <path d="M12 7c0-2 2-2 2-4" />
+                            <path d="M17 7c0-2 2-2 2-4" />
+                        </svg>
+                    </div>
+
+                    <h3>Share Food</h3>
+
+                    <p class="pd-card-description">
+                        List your available surplus food so Receivers can
+                        discover it and request what they need.
+                    </p>
+
+                    <a href="{{ url_for('share_food') }}" class="pd-button">
+                        Share Food
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+                    </a>
+
+                </article>
+
+
+                <!-- MY FOOD LISTINGS -->
+
+                <article class="pd-card">
+
+                    <div class="pd-card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" />
+                            <path d="m4.5 7.5 7.5 4.3 7.5-4.3" />
+                            <path d="M12 12v9" />
+                            <path d="m8 5.3 8 4.5" />
+                        </svg>
+                    </div>
+
+                    <h3>My Food Listings</h3>
+
+                    <p class="pd-card-description">
+                        Keep track of the surplus food you have shared
+                        with the MealMatch community.
+                    </p>
+
+                    <a href="{{ url_for('my_food_listings') }}" class="pd-button">
+                        View Food Listings
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+                    </a>
+
+                </article>
+
+
+                <!-- INCOMING REQUESTS -->
+
+                <article class="pd-card">
+
+                    <div class="pd-card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <rect x="3" y="5" width="18" height="14" rx="2" />
+                            <path d="m4 7 8 6 8-6" />
+                            <path d="M8 16h3" />
+                        </svg>
+                    </div>
+
+                    <h3>Incoming Requests</h3>
+
+                    <p class="pd-card-description">
+                        View requests from Receivers, review their needs,
+                        and respond to incoming food requests.
+                    </p>
+
+                    <a href="{{ url_for('provider_requests') }}" class="pd-button">
+                        View Requests
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+                    </a>
+
+                </article>
+
+
+                <!-- CHAT -->
+
+                <article class="pd-card">
+
+                    <div class="pd-card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H7l-4 2v-5.5A7.5 7.5 0 1 1 20 11.5Z" />
+                            <path d="M8 11h.01M12 11h.01M16 11h.01" stroke-width="2.8" />
+                        </svg>
+                    </div>
+
+                    <h3>Chat with Receivers</h3>
+
+                    <p class="pd-card-description">
+                        Communicate with Receivers to coordinate food
+                        collection and confirm arrangements.
+                    </p>
+
+                    <a href="{{ url_for('provider_requests') }}" class="pd-button">
+                        Manage Conversations
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+                    </a>
+
+                </article>
+
+
+                <!-- AI AGENT -->
+
+                <article class="pd-card pd-ai-card">
+
+                    <div class="pd-card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <rect x="5" y="7" width="14" height="12" rx="3" />
+                            <path d="M12 3v4M9 12h.01M15 12h.01" />
+                            <path d="M9 16h6" />
+                            <path d="M2 11v4M22 11v4M9 22h6" />
+                        </svg>
+                    </div>
+
+                    <span class="pd-ai-label">Smart matching</span>
+
+                    <h3>MealMatch AI Agent</h3>
+
+                    <p class="pd-card-description">
+                        Find suitable Receivers for your available food.
+                        Compare quantities, requirements, locations and
+                        pickup times to help identify potential matches.
+                    </p>
+
+                    <button type="button" class="pd-button" onclick="showAIMessage()" aria-controls="providerAIMessage"
+                        aria-expanded="false">
+                        Find Best Receivers
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <p id="providerAIMessage" class="pd-ai-message" role="status" aria-live="polite" hidden></p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <footer class="pd-footer">
+
+            <a href="{{ url_for('logout') }}" class="pd-logout">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M10 17l5-5-5-5" />
+                    <path d="M15 12H3" />
+                    <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" />
+                </svg>
+
+                Logout
+
+            </a>
+
+        </footer>
+
+    </main>
+
+
+    <script>
+        function showAIMessage() {
+            const message = document.getElementById("providerAIMessage");
+            const button = document.querySelector(
+                ".provider-dashboard .pd-ai-card button"
+            );
+
+            message.textContent =
+                "The AI matching feature is the next step! " +
+                "It will connect your food listings with Receiver " +
+                "requirements to help identify suitable matches.";
+
+            message.hidden = false;
+
+            if (button) {
+                button.setAttribute("aria-expanded", "true");
+            }
+        }
+    </script>
+
+</body>
+
+</html>

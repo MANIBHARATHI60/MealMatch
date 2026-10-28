@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resend verification code | MealMatch</title>
+</head>
+
+<body>
+    <h1>Resend verification code</h1>
+    <p>Enter the email address you used to register. We’ll send a new code if that account still needs verification.</p>
+
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" required>
+        <button type="submit">Send a new code</button>
+    </form>
+
+    <p><a href="{{ url_for('login') }}">Back to login</a></p>
+</body>
+
+</html>

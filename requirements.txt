@@ -1,0 +1,5 @@
+Flask
+Flask-SocketIO
+PyMySQL
+simple-websocket
+python-dotenv

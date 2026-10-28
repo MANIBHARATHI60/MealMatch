@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Chat with Providers | MealMatch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* =========================================
+           GENERAL PAGE STYLING
+        ========================================= */
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f7f4;
+            color: #26352b;
+        }
+
+        .receiver-chat-page {
+            margin-left: 250px;
+            padding: 38px;
+            box-sizing: border-box;
+            min-height: 100vh;
+            animation: providerChatPageReveal 0.65s ease both;
+        }
+
+        .receiver-chat-page *,
+        .receiver-chat-page *::before,
+        .receiver-chat-page *::after {
+            box-sizing: border-box;
+        }
+
+
+        /* =========================================
+           PAGE ANIMATIONS
+        ========================================= */
+
+        @keyframes providerChatPageReveal {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes providerChatHeaderReveal {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes providerConversationReveal {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes providerChatCardShimmer {
+            from {
+                left: -120%;
+            }
+
+            to {
+                left: 150%;
+            }
+        }
+
+        @keyframes providerChatButtonShimmer {
+            from {
+                left: -120%;
+            }
+
+            to {
+                left: 150%;
+            }
+        }
+
+        @keyframes providerChatAccentFlow {
+            from {
+                background-position: 0% 50%;
+            }
+
+            to {
+                background-position: 200% 50%;
+            }
+        }
+
+
+        /* =========================================
+           PAGE HEADING
+        ========================================= */
+
+        .receiver-chat-page .page-heading {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+
+            margin-bottom: 35px;
+            padding: 30px 35px;
+
+            background:
+                radial-gradient(circle at 96% 4%,
+                    transparent 0 64px,
+                    rgba(255, 255, 255, 0.08) 65px 88px,
+                    transparent 89px),
+                radial-gradient(circle at 84% 112%,
+                    rgba(255, 255, 255, 0.07) 0 55px,
+                    transparent 56px),
+                linear-gradient(135deg,
+                    #174F2B 0%,
+                    #236B3A 55%,
+                    #2F7D46 100%);
+
+            border: 1px solid #236B3A;
+            border-radius: 20px;
+
+            box-shadow: 0 8px 28px rgba(23, 79, 43, 0.18);
+
+            animation: providerChatHeaderReveal 0.7s ease both;
+            animation-delay: 0.08s;
+
+            transition:
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .receiver-chat-page .page-heading h1 {
+            position: relative;
+            z-index: 1;
+
+            margin: 0 0 12px;
+
+            color: #ffffff;
+            font-size: clamp(27px, 3vw, 36px);
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.8px;
+
+            transition:
+                letter-spacing 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .receiver-chat-page .page-heading p {
+            position: relative;
+            z-index: 1;
+
+            max-width: 650px;
+            margin: 0;
+
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .providers-banner-icon {
+            position: absolute;
+
+            right: 30px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            font-size: 105px;
+            line-height: 1;
+
+            opacity: 0.18;
+
+            pointer-events: none;
+            user-select: none;
+
+            transition:
+                transform 0.3s ease,
+                opacity 0.3s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .page-heading:hover {
+                box-shadow: 0 12px 30px rgba(35, 107, 58, 0.19);
+            }
+
+            .receiver-chat-page .page-heading:hover h1 {
+                letter-spacing: -0.4px;
+            }
+
+            .receiver-chat-page .page-heading:hover .providers-banner-icon {
+                transform: translateY(-50%) scale(1.08);
+                opacity: 0.22;
+            }
+        }
+
+
+        /* =========================================
+           CONVERSATION GRID
+           MATCHES CHAT WITH RECEIVERS
+        ========================================= */
+
+        .receiver-chat-page .conversations-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+
+            gap: 24px;
+
+            align-items: stretch;
+            width: 100%;
+            min-width: 0;
+        }
+
+
+        /* =========================================
+           CONVERSATION CARDS
+           MATCHES PROVIDER CARD DIMENSIONS
+        ========================================= */
+
+        .receiver-chat-page .conversation-card {
+            position: relative;
+            isolation: isolate;
+
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+
+            gap: 15px;
+
+            width: 100%;
+            min-width: 0;
+
+            padding: 17px;
+
+            background: #ffffff;
+
+            border: 1px solid #e2ebe3;
+            border-radius: 19px;
+
+            box-shadow: 0 5px 18px rgba(29, 65, 39, 0.06);
+
+            overflow: hidden;
+
+            animation: providerConversationReveal 0.65s ease both;
+
+            transition:
+                transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+
+            transform-origin: center bottom;
+            will-change: transform;
+        }
+
+        .receiver-chat-page .conversation-card:nth-child(3n + 1) {
+            animation-delay: 0.08s;
+        }
+
+        .receiver-chat-page .conversation-card:nth-child(3n + 2) {
+            animation-delay: 0.16s;
+        }
+
+        .receiver-chat-page .conversation-card:nth-child(3n + 3) {
+            animation-delay: 0.24s;
+        }
+
+        .receiver-chat-page .conversation-card::before {
+            content: "";
+
+            position: absolute;
+            z-index: -1;
+
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 4px;
+
+            background: linear-gradient(90deg,
+                    #236b3a,
+                    #72c78a,
+                    #236b3a);
+
+            background-size: 200% 100%;
+
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+
+            transition:
+                opacity 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .receiver-chat-page .conversation-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 140px;
+            height: 140px;
+
+            right: -80px;
+            bottom: -90px;
+
+            border-radius: 50%;
+
+            background: rgba(74, 157, 94, 0.06);
+
+            pointer-events: none;
+
+            z-index: -1;
+
+            transition: transform 0.4s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .conversation-card:hover {
+                transform: translateY(-9px) scale(1.012);
+
+                border-color: #b9d9c2;
+
+                box-shadow:
+                    0 20px 38px rgba(35, 107, 58, 0.13),
+                    0 5px 12px rgba(35, 107, 58, 0.05);
+            }
+
+            .receiver-chat-page .conversation-card:hover::before {
+                opacity: 1;
+                transform: scaleX(1);
+                animation: providerChatAccentFlow 2s linear infinite;
+            }
+
+            .receiver-chat-page .conversation-card:hover::after {
+                transform: scale(1.8);
+                animation: providerChatCardShimmer 0.9s ease;
+            }
+        }
+
+
+        /* =========================================
+           FOOD IMAGE
+           MATCHES PROVIDER IMAGE HEIGHT
+        ========================================= */
+
+        .receiver-chat-page .food-image {
+            display: block;
+
+            width: 100%;
+            height: 175px;
+
+            object-fit: cover;
+
+            border-radius: 13px;
+
+            background: #e8f5ed;
+
+            flex-shrink: 0;
+
+            transition:
+                transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+                filter 0.4s ease,
+                box-shadow 0.4s ease;
+        }
+
+        .receiver-chat-page .food-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 54px;
+
+            background: linear-gradient(135deg,
+                    #e5f4e9,
+                    #f4faf5);
+
+            border: 1px dashed #c5dfcc;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .conversation-card:hover .food-image {
+                transform: scale(1.035);
+                filter: saturate(1.12) contrast(1.02);
+
+                box-shadow: 0 8px 18px rgba(35, 107, 58, 0.12);
+            }
+
+            .receiver-chat-page .conversation-card:hover .food-placeholder {
+                background: linear-gradient(135deg,
+                        #ddf0e2,
+                        #f2faf4);
+            }
+        }
+
+
+        /* =========================================
+           CONVERSATION DETAILS
+           MATCHES PROVIDER TEXT SPACING
+        ========================================= */
+
+        .receiver-chat-page .conversation-details {
+            flex: 1;
+            min-width: 0;
+
+            padding: 2px 2px 4px;
+        }
+
+        .receiver-chat-page .conversation-details h2 {
+            display: inline-block;
+
+            max-width: 100%;
+
+            margin: 2px 0 18px;
+
+            color: #26352b;
+
+            font-size: 22px;
+            font-weight: 750;
+            line-height: 1.4;
+
+            overflow-wrap: anywhere;
+
+            transition:
+                color 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .receiver-chat-page .conversation-details p {
+            display: flex;
+            align-items: flex-start;
+
+            gap: 6px;
+
+            margin: 12px 0;
+
+            color: #647168;
+
+            font-size: 14px;
+            line-height: 1.65;
+
+            overflow-wrap: anywhere;
+
+            transition: color 0.25s ease;
+        }
+
+        .receiver-chat-page .conversation-details strong {
+            flex-shrink: 0;
+            color: #43574a;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .conversation-card:hover .conversation-details h2 {
+                color: #236b3a;
+                transform: translateX(3px);
+            }
+
+            .receiver-chat-page .conversation-card:hover .conversation-details p {
+                color: #485b4d;
+            }
+        }
+
+
+        /* =========================================
+           STATUS BADGE
+           MATCHES PROVIDER STATUS BADGE
+        ========================================= */
+
+        .receiver-chat-page .status-badge {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 6px;
+
+            max-width: 100%;
+
+            padding: 7px 12px;
+
+            border: 1px solid #cbe7d2;
+            border-radius: 30px;
+
+            background: #eaf7ed;
+            color: #236b3a;
+
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+
+            text-transform: capitalize;
+            overflow-wrap: anywhere;
+
+            box-shadow: 0 2px 5px rgba(35, 107, 58, 0.04);
+
+            transition:
+                background-color 0.25s ease,
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .receiver-chat-page .status-badge::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: currentColor;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .conversation-card:hover .status-badge {
+                background: #dff3e4;
+                box-shadow: 0 4px 10px rgba(35, 107, 58, 0.10);
+                transform: translateY(-2px);
+            }
+        }
+
+
+        /* =========================================
+           OPEN CHAT BUTTON
+           MATCHES PROVIDER BUTTON DIMENSIONS
+        ========================================= */
+
+        .receiver-chat-page .open-chat-button {
+            position: relative;
+            isolation: isolate;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 9px;
+
+            width: 100%;
+            min-height: 47px;
+
+            padding: 12px 16px;
+
+            background: linear-gradient(135deg,
+                    #2c8045,
+                    #236b3a);
+
+            color: #ffffff;
+
+            text-align: center;
+            text-decoration: none;
+
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1.4;
+
+            border: 1px solid #236b3a;
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.10);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                background 0.25s ease;
+        }
+
+        .receiver-chat-page .open-chat-button::before {
+            content: "";
+
+            position: absolute;
+            z-index: -1;
+
+            top: -50%;
+            left: -80%;
+
+            width: 45%;
+            height: 200%;
+
+            background: rgba(255, 255, 255, 0.22);
+
+            transform: rotate(25deg);
+
+            transition: left 0.55s ease;
+
+            pointer-events: none;
+        }
+
+        .receiver-chat-page .open-chat-button::after {
+            content: "→";
+
+            font-size: 19px;
+            line-height: 1;
+
+            transition: transform 0.25s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .open-chat-button:hover {
+                background: linear-gradient(135deg,
+                        #236b3a,
+                        #184f2b);
+
+                color: #ffffff;
+
+                transform: translateY(-4px);
+
+                box-shadow:
+                    0 10px 22px rgba(35, 107, 58, 0.22),
+                    0 0 0 3px rgba(35, 107, 58, 0.06);
+            }
+
+            .receiver-chat-page .open-chat-button:hover::before {
+                left: 140%;
+            }
+
+            .receiver-chat-page .open-chat-button:hover::after {
+                transform: translateX(4px);
+            }
+        }
+
+        .receiver-chat-page .open-chat-button:active {
+            transform: translateY(-1px) scale(0.985);
+            box-shadow: 0 3px 8px rgba(35, 107, 58, 0.15);
+        }
+
+        .receiver-chat-page .open-chat-button:focus-visible,
+        .receiver-chat-page .back-button:focus-visible {
+            outline: 3px solid #85c997;
+            outline-offset: 4px;
+        }
+
+
+        /* =========================================
+           EMPTY CONVERSATIONS MESSAGE
+        ========================================= */
+
+        .receiver-chat-page .empty-message {
+            position: relative;
+            overflow: hidden;
+
+            padding: 50px 28px;
+
+            background: linear-gradient(135deg,
+                    #ffffff,
+                    #f5faf6);
+
+            border: 1px dashed #b9d9c4;
+            border-radius: 20px;
+
+            text-align: center;
+
+            box-shadow: 0 8px 25px rgba(35, 107, 58, 0.06);
+
+            animation: providerConversationReveal 0.6s ease both;
+
+            transition:
+                border-color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        .receiver-chat-page .empty-message h2 {
+            margin: 0 0 12px;
+
+            color: #236b3a;
+
+            font-size: 25px;
+        }
+
+        .receiver-chat-page .empty-message p {
+            max-width: 480px;
+
+            margin: 10px auto;
+
+            color: #68756b;
+
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .empty-message:hover {
+                border-color: #7ebd8e;
+
+                box-shadow: 0 12px 28px rgba(35, 107, 58, 0.10);
+
+                transform: translateY(-3px);
+            }
+        }
+
+
+        /* =========================================
+           BACK TO DASHBOARD BUTTON
+        ========================================= */
+
+        .receiver-chat-page .back-button {
+            position: relative;
+            isolation: isolate;
+
+            display: inline-flex !important;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            min-height: 45px;
+
+            margin-top: 30px;
+            margin-bottom: 15px;
+
+            padding: 12px 21px;
+
+            background: #ffffff !important;
+            color: #236b3a !important;
+
+            border: 1px solid #cfe1d2;
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            box-shadow: 0 3px 10px rgba(35, 107, 58, 0.05);
+
+            visibility: visible !important;
+            opacity: 1 !important;
+
+            transition:
+                background-color 0.25s ease,
+                color 0.25s ease,
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .receiver-chat-page .back-button::before {
+            content: "";
+
+            position: absolute;
+            z-index: -1;
+
+            top: -50%;
+            left: -80%;
+
+            width: 45%;
+            height: 200%;
+
+            background: rgba(35, 107, 58, 0.08);
+
+            transform: rotate(25deg);
+
+            transition: left 0.55s ease;
+
+            pointer-events: none;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .receiver-chat-page .back-button:hover {
+                background: #236b3a !important;
+                color: #ffffff !important;
+
+                border-color: #236b3a;
+
+                transform: translateY(-3px);
+
+                box-shadow: 0 8px 16px rgba(35, 107, 58, 0.18);
+            }
+
+            .receiver-chat-page .back-button:hover::before {
+                left: 140%;
+            }
+        }
+
+        .receiver-chat-page .back-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+
+        /* =========================================
+           MEDIUM SCREENS
+        ========================================= */
+
+        @media (max-width: 1200px) {
+
+            .receiver-chat-page {
+                padding: 28px;
+            }
+
+            .receiver-chat-page .conversations-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 20px;
+            }
+        }
+
+
+        /* =========================================
+           SMALL SCREENS
+        ========================================= */
+
+        @media (max-width: 768px) {
+
+            .receiver-chat-page {
+                margin-left: 210px;
+                padding: 20px;
+            }
+
+            .receiver-chat-page .page-heading {
+                padding: 24px 22px;
+                margin-bottom: 25px;
+            }
+
+            .receiver-chat-page .page-heading h1 {
+                font-size: 28px;
+            }
+
+            .receiver-chat-page .page-heading p {
+                font-size: 15px;
+            }
+
+            .providers-banner-icon {
+                right: 18px;
+                font-size: 48px;
+            }
+
+            .receiver-chat-page .conversations-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .receiver-chat-page .conversation-card {
+                padding: 16px;
+            }
+
+            .receiver-chat-page .food-image {
+                height: 190px;
+            }
+        }
+
+
+        /* =========================================
+           VERY SMALL SCREENS
+        ========================================= */
+
+        @media (max-width: 500px) {
+
+            .receiver-chat-page {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .receiver-chat-page .page-heading {
+                padding: 22px 18px;
+                border-radius: 14px;
+            }
+
+            .receiver-chat-page .page-heading h1 {
+                font-size: 25px;
+                padding-right: 12px;
+            }
+
+            .receiver-chat-page .page-heading p {
+                font-size: 14px;
+            }
+
+            .providers-banner-icon {
+                display: none;
+            }
+
+            .receiver-chat-page .conversation-card {
+                padding: 13px;
+                gap: 13px;
+            }
+
+            .receiver-chat-page .conversation-details h2 {
+                font-size: 20px;
+            }
+
+            .receiver-chat-page .food-image {
+                height: 165px;
+            }
+
+            .receiver-chat-page .open-chat-button {
+                font-size: 14px;
+            }
+
+            .receiver-chat-page .back-button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .receiver-chat-page .empty-message {
+                padding: 35px 18px;
+            }
+        }
+
+
+        /* =========================================
+           REDUCED MOTION ACCESSIBILITY
+        ========================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .receiver-chat-page,
+            .receiver-chat-page *,
+            .receiver-chat-page *::before,
+            .receiver-chat-page *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+
+            .receiver-chat-page .conversation-card:hover,
+            .receiver-chat-page .conversation-card:hover .food-image,
+            .receiver-chat-page .conversation-card:hover .conversation-details h2,
+            .receiver-chat-page .open-chat-button:hover,
+            .receiver-chat-page .back-button:hover,
+            .receiver-chat-page .empty-message:hover {
+                transform: none;
+            }
+        }
+
+        .receiver-chat-page .back-button {
+            position: relative !important;
+            isolation: isolate;
+            overflow: hidden;
+
+            background: linear-gradient(135deg, #2c8045, #236b3a) !important;
+            background-image: linear-gradient(135deg, #2c8045, #236b3a) !important;
+            color: #ffffff !important;
+            border: 1px solid #236b3a !important;
+
+            box-shadow: 0 4px 10px rgba(35, 107, 58, 0.10) !important;
+            transform: none;
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                background 0.25s ease;
+        }
+
+        .receiver-chat-page .back-button::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: -50%;
+            left: -80%;
+            width: 45%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.22);
+            transform: rotate(25deg);
+            transition: left 0.55s ease;
+            pointer-events: none;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .receiver-chat-page .back-button:hover {
+                background: linear-gradient(135deg, #236b3a, #184f2b) !important;
+                background-image: linear-gradient(135deg, #236b3a, #184f2b) !important;
+                color: #ffffff !important;
+                transform: translateY(-4px);
+                box-shadow:
+                    0 10px 22px rgba(35, 107, 58, 0.22),
+                    0 0 0 3px rgba(35, 107, 58, 0.06) !important;
+            }
+
+            .receiver-chat-page .back-button:hover::before {
+                left: 140%;
+            }
+        }
+
+        .receiver-chat-page .back-button:active {
+            transform: translateY(-1px) scale(0.985);
+            box-shadow: 0 3px 8px rgba(35, 107, 58, 0.15) !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <main class="receiver-chat-page">
+
+        <!-- PAGE HEADING -->
+
+        <div class="page-heading">
+
+            <h1>Chat with Providers 💬</h1>
+
+            <p>
+                Connect with food providers, discuss your requests,
+                and coordinate your food collection.
+            </p>
+
+            <span class="providers-banner-icon" aria-hidden="true">
+                💬
+            </span>
+
+        </div>
+
+
+        <!-- CONVERSATION LIST -->
+
+        {% if conversations %}
+
+        <div class="conversations-grid">
+
+            {% for item in conversations %}
+
+            <div class="conversation-card">
+
+                <!-- FOOD IMAGE -->
+
+                {% if item.image_filename %}
+
+                <img class="food-image" src="{{ url_for('static', filename='uploads/' ~ item.image_filename) }}"
+                    alt="{{ item.food_name }}" loading="lazy">
+
+                {% else %}
+
+                <div class="food-image food-placeholder">
+                    🍱
+                </div>
+
+                {% endif %}
+
+
+                <!-- CONVERSATION INFORMATION -->
+
+                <div class="conversation-details">
+
+                    <h2>{{ item.food_name }}</h2>
+
+                    <p>
+                        <strong>Food Provider:</strong>
+                        {{ item.provider_name }}
+                    </p>
+
+                    <p>
+                        <strong>Request Date:</strong>
+                        {{ item.created_at }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+
+                        <span class="status-badge">
+                            {{ item.request_status }}
+                        </span>
+                    </p>
+
+                </div>
+
+
+                <!-- OPEN CHAT -->
+
+                {% if item.request_status|string|trim|lower != 'completed' %}
+                <a href="/chat/{{ item.request_id }}" class="open-chat-button">
+                    Open Chat 💬
+                </a>
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- NO CONVERSATIONS -->
+
+        <div class="empty-message">
+
+            <h2>No Conversations Yet</h2>
+
+            <p>
+                When a provider accepts your food request,
+                the conversation will appear here.
+            </p>
+
+            <p>
+                You can browse available food and submit a request
+                to get started.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- BACK TO DASHBOARD -->
+
+        <a href="{{ url_for('dashboard') }}" class="back-button">
+            ← Back to Dashboard
+        </a>
+
+    </main>
+
+</body>
+
+
+</html>
