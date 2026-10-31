@@ -511,11 +511,17 @@
 
                     {% if item.request_status == 'completed' %}
 
+
+
                     <p class="handover-message">
                         Food received and confirmed! ✓
                     </p>
                     <a href="{{ url_for('meal_match_feedback', request_id=item.request_id) }}" class="chat-button">
+                        {% if item.review_id %}
+                        View Feedback About MealMatch 💬
+                        {% else %}
                         Give Feedback About MealMatch ⭐
+                        {% endif %}
                     </a>
                     {% if item.review_id %}
 

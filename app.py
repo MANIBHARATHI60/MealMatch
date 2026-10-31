@@ -3188,7 +3188,7 @@ def provider_requests(request_id=None):
         selected_request_id=request_id
     )
 
-    # ==========================================
+# ==========================================
 # OPEN A PRIVATE CHAT FOR A FOOD REQUEST
 # ==========================================
 
@@ -3204,7 +3204,7 @@ def open_chat(request_id):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT id, ngo_id, provider_id, status
+                SELECT id, ngo_id, provider_id, status, arrangement_confirmed
                 FROM requests
                 WHERE id = %s
                 """,
@@ -3234,11 +3234,8 @@ def open_chat(request_id):
     # Allow chat only after the request is accepted or confirmed.
     # Completed handovers can retain access to their conversation.
 
-    if food_request["status"] not in (
-        "accepted",
-        "confirmed",
-    ):
-        return "Chat is available after the arrangement is accepted.", 403
+    if not food_request["arrangement_confirmed"]:
+        return "Chat is available after the arrangement is confirmed.", 403
 
     return render_template(
         "chat.html",
@@ -4269,7 +4266,13 @@ Required format:
     explanations = {}
 
     try:
+        import time
+        ai_start_time = time.time()
 
+        print("AI request started")
+        print("System prompt length:", len(system_prompt))
+        print("User message length:", len(user_message))
+        print("Provider listing context length:", len(provider_listings_context))
         response = requests.post(
             OLLAMA_URL,
             json={
@@ -4834,41 +4837,64 @@ def ai_agent():
 
     # Give the local AI instructions about MealMatch
     system_prompt = f"""
-You are the MealMatch AI Agent.
+    You are the official MealMatch AI Agent.
 
-MealMatch connects surplus food providers with receivers such as
-NGOs, orphanages, and community organisations.
+    ABOUT MEALMATCH:
+    MealMatch connects surplus food providers with receivers, including NGOs,
+    orphanages, community organisations and ordinary individuals.
 
-The current user is a {user_type}.
-{provider_listings_context}
+    PLATFORM WORKFLOW:
+    1. Providers publish surplus food listings.
+    2. Receivers browse food and submit requests.
+    3. Receivers can negotiate quantity and price.
+    4. Providers accept or reject requests and proposals.
+    5. Users receive notifications and can communicate through private chat.
+    6. Providers mark handovers as completed.
+    7. Receivers confirm actual receipt.
+    8. Completed requests allow reviews and ratings.
 
-Your responsibilities:
-1. Explain how to use MealMatch.
-2. Help users understand food listings, food requests, chat,
-   pickup coordination, and feedback.
-3. Give helpful answers in clear, friendly language.
-4. For problems involving a specific account, listing, request,
-   payment, licence, or message, do not claim to have checked
-   records unless the application has actually provided that data.
-5. Do not claim to send messages, change requests, verify licences,
-   or complete pickups. You cannot perform those actions yet.
-6. For unrelated questions, politely guide the user back to
-   MealMatch and its food-sharing activities.
-7. Never invent MealMatch policies or pretend that an action
-   has been completed.
+    IMPORTANT RULES:
+    - MealMatch is only a connecting platform.
+    - MealMatch does not provide volunteers, transport, delivery or collection.
+    - Receivers arrange and collect food directly from providers.
+    - Providers must enter an FSSAI licence number during registration.
+    - Never claim that FSSAI licences are verified.
+    - Applicable request and confirmation stages have a 15-minute deadline.
+    - Never invent food listings, prices, quantities or account information.
+    - Never claim an action has happened unless the application confirms it.
+    - Answer questions about MealMatch accurately and concisely.
+    - Politely redirect unrelated questions to MealMatch topics.
 
-For provider questions about their current listings, use the listing data provided above.
-If the answer is not in that data, say you don't have that information instead of guessing.
-The listing data includes active listings only.
+    AI MODES:
+    ASK AI: Explain MealMatch, registration, browsing, requests, negotiations,
+    notifications, chats and confirmations.
 
-Answer the user's question directly and concisely.
-"""
+    FIND FOOD MATCHES: Help users understand suitable food matches using
+    available application data. Explain why a listing matches or does not match.
+    Never invent listings or matching information.
 
+    CURRENT USER ROLE: {user_type}
+
+    {provider_listings_context}
+    """
+
+    print("New MealMatch prompt length:", len(system_prompt))
+    
     try:
         response = requests.post(
             OLLAMA_URL,
             json={
                 "model": OLLAMA_MODEL,
+
+                # Keep the model loaded to avoid repeated loading delays
+                "keep_alive": "10m",
+
+                # Control response generation
+                "options": {
+                    "num_predict": 220,
+                    "temperature": 0.5
+                },
+
                 "messages": [
                     {
                         "role": "system",
@@ -4879,10 +4905,12 @@ Answer the user's question directly and concisely.
                         "content": user_message
                     }
                 ],
+
                 "stream": False
             },
             timeout=30
         )
+
 
         response.raise_for_status()
         result = response.json()

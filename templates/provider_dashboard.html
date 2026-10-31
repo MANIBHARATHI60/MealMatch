@@ -1087,15 +1087,14 @@
                         pickup times to help identify potential matches.
                     </p>
 
-                    <button type="button" class="pd-button" onclick="showAIMessage()" aria-controls="providerAIMessage"
-                        aria-expanded="false">
+                    <a href="{{ url_for('ai_agent') }}" class="pd-button">
                         Find Best Receivers
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" aria-hidden="true">
                             <path d="M5 12h14" />
                             <path d="m12 5 7 7-7 7" />
                         </svg>
-                    </button>
+                    </a>
 
                     <p id="providerAIMessage" class="pd-ai-message" role="status" aria-live="polite" hidden></p>
 

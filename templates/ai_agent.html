@@ -3846,6 +3846,140 @@
         .ai-mode-options .ai-mode-button:first-child:active {
             transform: translateY(0);
         }
+
+        /* =========================================
+   COMPACT, NORMAL CHAT MESSAGE BUBBLES
+========================================= */
+
+        /* Normal message rows */
+        .ai-messages>.ai-message-row:not(.ai-arrangement-row) {
+            display: flex !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: 0 !important;
+            height: auto !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+            gap: 10px;
+
+            align-self: flex-start !important;
+        }
+
+        /* User messages appear on the right */
+        .ai-messages>.ai-message-row.user-row {
+            flex-direction: row-reverse !important;
+            justify-content: flex-start !important;
+            align-self: flex-end !important;
+        }
+
+        /* Actual message bubbles */
+        .ai-messages .ai-message-row:not(.ai-arrangement-row) .ai-message {
+            display: block !important;
+
+            flex: 0 1 auto !important;
+            width: fit-content !important;
+            max-width: min(680px, calc(100% - 42px)) !important;
+
+            height: auto !important;
+            min-height: 0 !important;
+
+            align-self: flex-start !important;
+
+            padding: 11px 15px !important;
+            margin: 0 !important;
+
+            text-align: left !important;
+            white-space: pre-wrap !important;
+            overflow-wrap: anywhere;
+
+            line-height: 1.6 !important;
+        }
+
+        /* Keep text inside bubbles left-aligned */
+        .ai-messages .ai-message-row:not(.ai-arrangement-row) .ai-message p {
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: left !important;
+        }
+
+        /* Keep avatars at the top of messages */
+        .ai-messages .ai-message-row:not(.ai-arrangement-row) .ai-message-avatar {
+            flex: 0 0 32px;
+            align-self: flex-start !important;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+            .ai-messages .ai-message-row:not(.ai-arrangement-row) .ai-message {
+                max-width: calc(100% - 42px) !important;
+            }
+        }
+
+        /* Initial welcome message spacing */
+        .ai-message.welcome-message {
+            white-space: normal !important;
+            height: auto !important;
+            min-height: 0 !important;
+            width: fit-content !important;
+            max-width: 420px !important;
+            text-align: left !important;
+        }
+
+        .ai-message.welcome-message p {
+            white-space: normal !important;
+            margin: 0 0 10px !important;
+            line-height: 1.6 !important;
+        }
+
+        .ai-message.welcome-message p:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        /* Keep both mode buttons green */
+        .ai-page .ai-mode-button,
+        .ai-page .ai-mode-button:not(.active),
+        .ai-page .ai-mode-button.active {
+            background: #236b3a !important;
+            border-color: #236b3a !important;
+            color: #ffffff !important;
+        }
+
+        /* Hover effect for both buttons */
+        .ai-page .ai-mode-button:hover {
+            background: #184f2b !important;
+            border-color: #184f2b !important;
+            color: #ffffff !important;
+        }
+
+        /* Ask AI button: prevent white flashing */
+        #askAiMode,
+        #askAiMode:hover,
+        #askAiMode:focus,
+        #askAiMode:focus-visible,
+        #askAiMode:active {
+            color: #ffffff !important;
+            animation: none !important;
+            filter: none !important;
+            transition: box-shadow 0.2s ease !important;
+        }
+
+        /* Preserve glossy hover effect */
+        #askAiMode:hover {
+            background: #184f2b !important;
+            border-color: #184f2b !important;
+            box-shadow:
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 5px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Preserve selected button ring */
+        .ai-page .ai-mode-button.active {
+            box-shadow: 0 0 0 3px rgba(35, 107, 58, 0.2);
+        }
     </style>
 </head>
 
@@ -4025,21 +4159,13 @@
 
                         <div class="ai-message-avatar">✦</div>
 
-                        <div class="ai-message">
-                            <p>
-                                Hi! Welcome to MealMatch. 👋
-
-                                I can help you understand the platform
-                                or find food listings that fit your needs.
-
-                                Choose a mode below to get started.
-                            </p>
+                        <div class="ai-message welcome-message">
+                            <p>Hi! Welcome to MealMatch. 👋</p>
+                            <p>I can help you understand the platform or find food listings that fit your needs.</p>
+                            <p>Choose a mode below to get started.</p>
                         </div>
 
-
                     </div>
-
-
 
                     <!-- RECEIVER ARRANGEMENT CONFIRMATION -->
 
@@ -4131,11 +4257,13 @@
 
                     <div class="ai-mode-options">
 
-                        <button type="button" class="ai-mode-button active" id="askAiMode" aria-pressed="true">
+                        <button type="button" class="ai-mode-button active glossy-green-button" id="askAiMode"
+                            aria-pressed="true">
                             💬 Ask AI
                         </button>
 
-                        <button type="button" class="ai-mode-button" id="findMatchesMode" aria-pressed="false">
+                        <button type="button" class="ai-mode-button glossy-green-button" id="findMatchesMode"
+                            aria-pressed="false">
                             🍱 Find Food Matches
                         </button>
 

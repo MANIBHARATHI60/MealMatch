@@ -904,7 +904,7 @@
                     locations and availability to rank suitable options.
                 </p>
 
-                <button type="button" class="dashboard-button ai-button" onclick="showAIMessage()">
+                <a href="{{ url_for('ai_agent') }}" class="dashboard-button ai-button">
                     Find Best Food Matches
 
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -912,8 +912,7 @@
                         <path d="M5 12h14"></path>
                         <path d="m13 6 6 6-6 6"></path>
                     </svg>
-
-                </button>
+                </a>
 
                 <p id="aiMessage" style="display: none;" role="status" aria-live="polite"></p>
 
